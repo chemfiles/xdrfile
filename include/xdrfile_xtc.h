@@ -1,10 +1,4 @@
-/* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*- 
- *
- * $Id$
- *
- /* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
- *
- * $Id$
+/* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
  *
  * Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
  * All rights reserved.
@@ -39,23 +33,23 @@ extern "C" {
 #endif
 
 #include "xdrfile.h"
-  
-  /* All functions return exdrOK if succesfull. 
+
+  /* All functions return exdrOK if succesfull.
    * (error codes defined in xdrfile.h).
-   */  
-   
+   */
+
   /* This function returns the number of atoms in the xtc file in *natoms */
   extern int read_xtc_natoms(char *fn,int *natoms);
-  
+
   /* Read one frame of an open xtc file */
   extern int read_xtc(XDRFILE *xd,int natoms,int *step,float *time,
 		      matrix box,rvec *x,float *prec);
-  
+
   /* Write a frame to xtc file */
   extern int write_xtc(XDRFILE *xd,
 		       int natoms,int step,float time,
 		       matrix box,rvec *x,float prec);
-  
+
 #ifdef __cplusplus
 }
 #endif

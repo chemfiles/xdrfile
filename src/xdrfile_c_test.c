@@ -1,11 +1,4 @@
 /* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*- 
- *
- * $Id$
- *
- /* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
- *
- * $Id$
- *
  * Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
  * All rights reserved.
  *
@@ -92,7 +85,7 @@ static void test_xtc()
 	rvec *x2,*x1;
 	float prec2,prec1=1000;
 	float toler=1e-3;
-	
+
 	printf("Testing xtc functionality:");
 	for(i=0; (i<DIM); i++)
 		for(j=0; (j<DIM); j++)
@@ -100,7 +93,7 @@ static void test_xtc()
 	x1 = calloc(natoms1,sizeof(*x1));
 	if (NULL == x1)
 		die("Allocating memory for x1 in test_xtc");
-	
+
 	for(i=0; (i<natoms1); i++)
 		for(j=0; (j<DIM); j++)
 			x1[i][j] = (i+1)*3.7 + (j+1);
@@ -114,7 +107,7 @@ static void test_xtc()
 				die_r("Writing xtc file",result);
 		}
 	xdrfile_close(xd);
-	
+
 	result = read_xtc_natoms(testfn,&natoms2);
 	if (exdrOK != result)
 		die_r("read_xtc_natoms",result);
@@ -123,12 +116,12 @@ static void test_xtc()
 	x2 = calloc(natoms2,sizeof(x2[0]));
 	if (NULL == x2)
 		die("Allocating memory for x2");
-		
-		
+
+
 	xd = xdrfile_open(testfn,"r");
 	if (NULL == xd)
 		die("Opening xdrfile for reading");
-	
+
 	k = 0;
 	do
 		{
@@ -156,7 +149,7 @@ static void test_xtc()
 				}
 			k++;
 		} while (result == exdrOK);
-		
+
 	xdrfile_close(xd);
 #ifdef HAVE_UNISTD
 	unlink(testfn);
@@ -176,7 +169,7 @@ static void test_trr()
 	rvec *x2,*x1;
 	float lambda2,lambda1=0.4;
 	float toler=1e-3;
-	
+
 	printf("Testing trr functionality:");
 	for(i=0; (i<DIM); i++)
 		for(j=0; (j<DIM); j++)
@@ -184,7 +177,7 @@ static void test_trr()
 	x1 = calloc(natoms1,sizeof(*x1));
 	if (NULL == x1)
 		die("Allocating memory for x1 in test_xtc");
-	
+
 	for(i=0; (i<natoms1); i++)
 		for(j=0; (j<DIM); j++)
 			x1[i][j] = (i+1)*3.7 + (j+1);
@@ -198,7 +191,7 @@ static void test_trr()
 				die_r("Writing trr file",result);
 		}
 	xdrfile_close(xd);
-	
+
 	result = read_trr_natoms(testfn,&natoms2);
 	if (exdrOK != result)
 		die_r("read_trr_natoms",result);
@@ -207,13 +200,13 @@ static void test_trr()
 	x2 = calloc(natoms2,sizeof(x2[0]));
 	if (NULL == x2)
 		die("Allocating memory for x2");
-		
-		
+
+
 	xd = xdrfile_open(testfn,"r");
 	if (NULL == xd)
 		die("Opening trr file for reading");
-	
-	for(k=0; (k<nframes); k++) 
+
+	for(k=0; (k<nframes); k++)
 		{
 			result = read_trr(xd,natoms2,&step2,&time2,&lambda2,box2,x2,NULL,NULL);
 			if (exdrOK != result)
@@ -234,8 +227,8 @@ static void test_trr()
 				for(j=0; (j<DIM); j++)
 					if (fabs(x2[i][j] - x1[i][j]) > toler)
 						die("x incorrect");
-		} 
-	
+		}
+
 	xdrfile_close(xd);
 #ifdef HAVE_UNISTD
 	unlink(testfn);
@@ -249,11 +242,11 @@ static void test_basic()
 	double test_jj;     // 16 significant digits
 #define EPSILON_1 1e-7
 #define EPSILON_2 1e-4
-	
+
 	printf("Testing basic xdrfile library:");
 	for (test_ii = 1.0e1; test_ii < 1.0e2; (test_ii = test_ii + pow(M_PI, 0.00011)))
 		{
-		
+
 #define BUFLEN 37
 	XDRFILE *xfp;
 	int i, j, k, len, ncoord = BUFLEN/3;
@@ -281,7 +274,7 @@ static void test_basic()
 	strcpy(ptr, buf);
 	strcpy((char *) uptr, buf);
 	/* Initiate float arrays */
-	for (i = 0; (i < BUFLEN); i++) 
+	for (i = 0; (i < BUFLEN); i++)
 	{
 		fptr[i] = cos(i * 13.0 / M_PI);
 		dptr[i] = sin(i * 13.0 / M_PI);
@@ -407,7 +400,7 @@ static void test_basic()
 		int nc = ncoord;
 		if (xdrfile_decompress_coord_float(fptr2, &nc, &ff, xfp) != ncoord)
 			die("Reading compress_coord_float");
-		if (fabs(ff - fprec[k]) > EPSILON_1) 
+		if (fabs(ff - fprec[k]) > EPSILON_1)
 			{
 				printf("Found precision %f, expected %f\n", ff, fprec[k]);
 				die("Float precision");
@@ -444,14 +437,14 @@ static void test_basic()
 
 	if (xdrfile_close(xfp) != 0)
 		die("Can not close xdr file");
-		} 
+		}
 #ifdef HAVE_UNISTD
 	unlink(testfn);
 #endif
 	printf(" PASSED\n");
 }
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
 	/* Test basic stuff */
 	test_basic();
@@ -459,6 +452,6 @@ int main(int argc, char *argv[])
 	test_xtc();
 
 	test_trr();
-		
+
 	return 0;
 }

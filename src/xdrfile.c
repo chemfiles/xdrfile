@@ -25,38 +25,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Get HAVE_RPC_XDR_H, F77_FUNC from config.h if available */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <limits.h>
+#include <stdint.h>
 
 #define _FILE_OFFSET_BITS  64
 
-/* get fixed-width types if we are using ANSI C99 */
-#ifdef HAVE_STDINT_H
-#  include <stdint.h>
-#elif (defined HAVE_INTTYPES_H)
-#  include <inttypes.h>
-#endif
-
-
-#ifdef HAVE_RPC_XDR_H
-#  include <rpc/rpc.h>
-#  include <rpc/xdr.h>
-#endif
-
 #include "xdrfile.h"
-
-/* Default FORTRAN name mangling is: lower case name, append underscore */
-#ifndef F77_FUNC
-#define F77_FUNC(name,NAME) name ## _
-#endif
 
 char *exdr_message[exdrNR] = {
 	"OK",
@@ -1729,291 +1707,6 @@ xdrfile_compress_coord_double(double   *ptr,
 		return -1;
 }
 
-
-/* Dont try do document Fortran interface, since
- * Doxygen barfs at the F77_FUNC macro
- */
-#ifndef DOXYGEN
-
-/*************************************************************
- * Fortran77 interface for reading/writing portable data     *
- * The routine are not threadsafe when called from Fortran   *
- * (as they are when called from C) unless you compile with  *
- * this file with posix thread support.                      *
- * Note that these are not multithread-safe.                 *
- *************************************************************/
-#define MAX_FORTRAN_XDR 1024
-static XDRFILE *f77xdr[MAX_FORTRAN_XDR]; /* array of file handles */
-static int      f77init = 1;             /* zero array first time */
-
-/* internal to this file: C<-->Fortran string conversion */
-static int ftocstr(char *dest, int dest_len, char *src, int src_len);
-static int ctofstr(char *dest, int dest_len, char *src);
-
-
-void
-F77_FUNC(xdropen,XDROPEN)(int *fid, char *filename, char *mode,
-						  int fn_len, int mode_len)
-{
-	char cfilename[512];
-	char cmode[5];
-	int i;
-
-	/* zero array at first invocation */
-	if(f77init) {
-		for(i=0;i<MAX_FORTRAN_XDR;i++)
-			f77xdr[i]=NULL;
-		f77init=0;
-	}
-	i=0;
-
-	/* nf77xdr is always smaller or equal to MAX_FORTRAN_XDR */
-	while(i<MAX_FORTRAN_XDR && f77xdr[i]!=NULL)
-		i++;
-	if(i==MAX_FORTRAN_XDR) {
-		*fid = -1;
-	} else if (ftocstr(cfilename, sizeof(cfilename), filename, fn_len)) {
-		*fid = -1;
-	} else if (ftocstr(cmode, sizeof(cmode), mode,mode_len)) {
-		*fid = -1;
-	} else {
-		f77xdr[i]=xdrfile_open(cfilename,cmode);
-		/* return the index in the array as a fortran file handle */
-		*fid=i;
-	}
-}
-
-void
-F77_FUNC(xdrclose,XDRCLOSE)(int *fid)
-{
-    /* first close it */
-    xdrfile_close(f77xdr[*fid]);
-    /* the remove it from file handle list */
-    f77xdr[*fid]=NULL;
-}
-
-
-void
-F77_FUNC(xdrrint,XDRRINT)(int *fid, int *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_read_int(data,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrwint,XDRWINT)(int *fid, int *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_write_int(data,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrruint,XDRRUINT)(int *fid, unsigned int *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_read_uint(data,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrwuint,XDRWUINT)(int *fid, unsigned int *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_write_uint(data,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrrchar,XDRRCHAR)(int *fid, char *ip, int *ndata, int *ret)
-{
-	*ret = xdrfile_read_char(ip,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrwchar,XDRWCHAR)(int *fid, char *ip, int *ndata, int *ret)
-{
-	*ret = xdrfile_write_char(ip,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrruchar,XDRRUCHAR)(int *fid, unsigned char *ip, int *ndata, int *ret)
-{
-	*ret = xdrfile_read_uchar(ip,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrwuchar,XDRWUCHAR)(int *fid, unsigned char *ip, int *ndata, int *ret)
-{
-	*ret = xdrfile_write_uchar(ip,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrrshort,XDRRSHORT)(int *fid, short *ip, int *ndata, int *ret)
-{
-	*ret = xdrfile_read_short(ip,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrwshort,XDRWSHORT)(int *fid, short *ip, int *ndata, int *ret)
-{
-	*ret = xdrfile_write_short(ip,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrrushort,XDRRUSHORT)(int *fid, unsigned short *ip, int *ndata, int *ret)
-{
-	*ret = xdrfile_read_ushort(ip,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrwushort,XDRWUSHORT)(int *fid, unsigned short *ip, int *ndata, int *ret)
-{
-	*ret = xdrfile_write_ushort(ip,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrrsingle,XDRRSINGLE)(int *fid, float *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_read_float(data,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrwsingle,XDRWSINGLE)(int *fid, float *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_write_float(data,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrrdouble,XDRRDOUBLE)(int *fid, double *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_read_double(data,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrwdouble,XDRWDOUBLE)(int *fid, double *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_write_double(data,*ndata,f77xdr[*fid]);
-}
-
-static int ftocstr(char *dest, int destlen, char *src, int srclen)
-{
-    char *p;
-
-    p = src + srclen;
-    while ( --p >= src && *p == ' ' );
-    srclen = p - src + 1;
-    destlen--;
-    dest[0] = 0;
-    if (srclen > destlen)
-		return 1;
-    while (srclen--)
-		(*dest++ = *src++);
-    *dest = '\0';
-    return 0;
-}
-
-
-static int ctofstr(char *dest, int destlen, char *src)
-{
-    while (destlen && *src) {
-        *dest++ = *src++;
-        destlen--;
-    }
-    while (destlen--)
-        *dest++ = ' ';
-    return 0;
-}
-
-
-void
-F77_FUNC(xdrrstring,XDRRSTRING)(int *fid, char *str, int *ret, int len)
-{
-	char *cstr;
-
-	if((cstr=(char*)malloc((len+1)*sizeof(char)))==NULL) {
-		*ret = 0;
-		return;
-	}
-	if (ftocstr(cstr, len+1, str, len)) {
-		*ret = 0;
-		free(cstr);
-		return;
-	}
-
-	*ret = xdrfile_read_string(cstr, len+1,f77xdr[*fid]);
-	ctofstr( str, len , cstr);
-	free(cstr);
-}
-
-void
-F77_FUNC(xdrwstring,XDRWSTRING)(int *fid, char *str, int *ret, int len)
-{
-	char *cstr;
-
-	if((cstr=(char*)malloc((len+1)*sizeof(char)))==NULL) {
-		*ret = 0;
-		return;
-	}
-	if (ftocstr(cstr, len+1, str, len)) {
-		*ret = 0;
-		free(cstr);
-		return;
-	}
-
-	*ret = xdrfile_write_string(cstr, f77xdr[*fid]);
-	ctofstr( str, len , cstr);
-	free(cstr);
-}
-
-void
-F77_FUNC(xdrropaque,XDRROPAQUE)(int *fid, char *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_read_opaque(data,*ndata,f77xdr[*fid]);
-}
-
-void
-F77_FUNC(xdrwopaque,XDRWOPAQUE)(int *fid, char *data, int *ndata, int *ret)
-{
-	*ret = xdrfile_write_opaque(data,*ndata,f77xdr[*fid]);
-}
-
-
-/* Write single-precision compressed 3d coordinates */
-void
-F77_FUNC(xdrccs,XDRCCS)(int *fid, float *data, int *ncoord,
-						float *precision, int *ret)
-{
-    *ret = xdrfile_compress_coord_float(data,*ncoord,*precision,f77xdr[*fid]);
-}
-
-
-/* Read single-precision compressed 3d coordinates */
-void
-F77_FUNC(xdrdcs,XDRDCS)(int *fid, float *data, int *ncoord,
-						float *precision, int *ret)
-{
-	*ret = xdrfile_decompress_coord_float(data,ncoord,precision,f77xdr[*fid]);
-}
-
-
-/* Write compressed 3d coordinates from double precision data */
-void
-F77_FUNC(xdrccd,XDRCCD)(int *fid, double *data, int *ncoord,
-						double *precision, int *ret)
-{
-	*ret = xdrfile_compress_coord_double(data,*ncoord,*precision,f77xdr[*fid]);
-}
-
-/* Read compressed 3d coordinates into double precision data */
-void
-F77_FUNC(xddcd,XDRDCD)(int *fid, double *data, int *ncoord,
-					   double *precision, int *ret)
-{
-    *ret = xdrfile_decompress_coord_double(data,ncoord,precision,f77xdr[*fid]);
-}
-
-
-
-
-
-
-
-#endif /* DOXYGEN */
-
 /*************************************************************
  * End of higher-level routines - dont change things below!  *
  *************************************************************/
@@ -2043,7 +1736,6 @@ F77_FUNC(xddcd,XDRDCD)(int *fid, double *data, int *ncoord,
  * You do NOT want to change things here since it would make *
  * things incompatible with the standard RPC/XDR routines.   *
  *************************************************************/
-#ifndef HAVE_RPC_XDR_H
 
 /*
  * What follows is a modified version of the Sun XDR code. For reference
@@ -2605,7 +2297,3 @@ xdrstdio_setpos (XDR *xdrs, unsigned int pos)
 {
 	return fseek ((FILE *) xdrs->x_private, pos, 0) < 0 ? 0 : 1;
 }
-
-
-
-#endif /* HAVE_RPC_XDR_H not defined */

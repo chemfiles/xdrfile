@@ -25,8 +25,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _xdrfile_trr_h
-#define _xdrfile_trr_h
+#ifndef XDRFILE_TRR_H
+#define XDRFILE_TRR_H
 
 #ifdef __cplusplus
 extern "C" {

@@ -65,8 +65,10 @@
  * your system supports it; it is just the random access we cannot trust!
  */
 
-#ifndef _XDRFILE_H_
-#define _XDRFILE_H_
+#ifndef XDRFILE_H
+#define XDRFILE_H
+
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -338,7 +340,7 @@ int xdrfile_write_double(double* ptr, int ndata, XDRFILE* xfp);
  *
  *  \return        Number of characters read, including end-of-string
  */
-int xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp);
+size_t xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp);
 
 /*! \brief Write a string (array of characters)
  *
@@ -347,7 +349,7 @@ int xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp);
  *
  *  \return        Number of characters written, including end-of-string
  */
-int xdrfile_write_string(char* ptr, XDRFILE* xfp);
+size_t xdrfile_write_string(char* ptr, XDRFILE* xfp);
 
 /*! \brief Read raw bytes from file (unknown datatype)
  *

@@ -108,7 +108,7 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
             return exdrSTRING;
         }
     } else {
-        slen = strlen(version) + 1;
+        slen = (int)(strlen(version) + 1);
         if (xdrfile_read_int(&slen, 1, xd) != 1) {
             return exdrINT;
         }
@@ -165,20 +165,20 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
         if (xdrfile_read_double(&sh->td, 1, xd) != 1) {
             return exdrDOUBLE;
         }
-        sh->tf = sh->td;
+        sh->tf = (float)sh->td;
         if (xdrfile_read_double(&sh->lambdad, 1, xd) != 1) {
             return exdrDOUBLE;
         }
-        sh->lambdaf = sh->lambdad;
+        sh->lambdaf = (float)sh->lambdad;
     } else {
         if (xdrfile_read_float(&sh->tf, 1, xd) != 1) {
             return exdrFLOAT;
         }
-        sh->td = sh->tf;
+        sh->td = (double)sh->tf;
         if (xdrfile_read_float(&sh->lambdaf, 1, xd) != 1) {
             return exdrFLOAT;
         }
-        sh->lambdad = sh->lambdaf;
+        sh->lambdad = (double)sh->lambdaf;
     }
 
     return exdrOK;
@@ -198,7 +198,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                 for (i = 0; (i < DIM); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != box) {
-                            pvd[i * DIM + j] = box[i][j];
+                            pvd[i * DIM + j] = (double)box[i][j];
                         }
                     }
                 }
@@ -207,7 +207,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                 for (i = 0; (i < DIM); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != box) {
-                            box[i][j] = pvd[i * DIM + j];
+                            box[i][j] = (float)pvd[i * DIM + j];
                         }
                     }
                 }
@@ -239,7 +239,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                 for (i = 0; (i < sh->natoms); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != x) {
-                            dx[i * DIM + j] = x[i][j];
+                            dx[i * DIM + j] = (double)x[i][j];
                         }
                     }
                 }
@@ -250,7 +250,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     for (i = 0; (i < sh->natoms); i++) {
                         for (j = 0; (j < DIM); j++) {
                             if (NULL != x) {
-                                x[i][j] = dx[i * DIM + j];
+                                x[i][j] = (float)dx[i * DIM + j];
                             }
                         }
                     }
@@ -264,7 +264,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                 for (i = 0; (i < sh->natoms); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != x) {
-                            dx[i * DIM + j] = v[i][j];
+                            dx[i * DIM + j] = (double)v[i][j];
                         }
                     }
                 }
@@ -274,7 +274,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                 for (i = 0; (i < sh->natoms); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != v) {
-                            v[i][j] = dx[i * DIM + j];
+                            v[i][j] = (float)dx[i * DIM + j];
                         }
                     }
                 }
@@ -287,7 +287,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                 for (i = 0; (i < sh->natoms); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != x) {
-                            dx[i * DIM + j] = f[i][j];
+                            dx[i * DIM + j] = (double)f[i][j];
                         }
                     }
                 }
@@ -297,7 +297,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                 for (i = 0; (i < sh->natoms); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != f) {
-                            f[i][j] = dx[i * DIM + j];
+                            f[i][j] = (float)dx[i * DIM + j];
                         }
                     }
                 }
@@ -445,8 +445,8 @@ static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda,
         sh->natoms = *natoms;
         sh->step = *step;
         sh->nre = 0;
-        sh->td = *t;
-        sh->lambdad = *lambda;
+        sh->td = (double)(*t);
+        sh->lambdad = (double)(*lambda);
         sh->tf = *t;
         sh->lambdaf = *lambda;
     }
@@ -456,8 +456,8 @@ static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda,
     if (bRead) {
         *natoms = sh->natoms;
         *step = sh->step;
-        *t = sh->td;
-        *lambda = sh->lambdad;
+        *t = (float)(sh->td);
+        *lambda = (float)(sh->lambdad);
     }
     if ((result = do_htrn(xd, bRead, sh, box, x, v, f)) != exdrOK) {
         return result;

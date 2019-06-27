@@ -76,7 +76,7 @@ static int xtc_coord(
 	float* prec,
     mybool bRead
 ) {
-    int i, j, result;
+    int result;
 
     /* box */
     result = xdrfile_read_float(box[0], DIM * DIM, xd);

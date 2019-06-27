@@ -26,8 +26,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _xdrfile_xtc_h
-#define _xdrfile_xtc_h
+#ifndef XDRFILE_XTC_H
+#define XDRFILE_XTC_H
 
 #ifdef __cplusplus
 extern "C" {

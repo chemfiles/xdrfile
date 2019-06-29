@@ -844,6 +844,10 @@ int xdrfile_decompress_coord_float(float* ptr, int* size, float* precision,
             smallnum = magicints[smallidx] / 2;
         }
         sizesmall[0] = sizesmall[1] = sizesmall[2] = magicints[smallidx];
+        if (sizesmall[0] == 0 || sizesmall[1] == 0 || sizesmall[2] == 0) {
+            fprintf(stderr, "Invalid size found in 'xdrfile_decompress_coord_float'.\n");
+            return -1;
+        }
     }
     return *size;
 }
@@ -1323,6 +1327,10 @@ int xdrfile_decompress_coord_double(double* ptr, int* size, double* precision,
             smallnum = magicints[smallidx] / 2;
         }
         sizesmall[0] = sizesmall[1] = sizesmall[2] = magicints[smallidx];
+        if (sizesmall[0] == 0 || sizesmall[1] == 0 || sizesmall[2] == 0) {
+            fprintf(stderr, "Invalid size found in 'xdrfile_decompress_coord_double'.\n");
+            return -1;
+        }
     }
     return *size;
 }

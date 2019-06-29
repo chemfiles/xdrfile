@@ -38,15 +38,22 @@ extern "C" {
  * (error codes defined in xdrfile.h).
  */
 
-/* This function returns the number of atoms in the xtc file in *natoms */
+/* This function returns the number of atoms in the trr file in *natoms */
 extern int read_trr_natoms(const char* fn, int* natoms);
 
-/* Read one frame of an open xtc file. If either of x,v,f,box are
+/* This function returns the number of frames and the number of atoms
+ * in the trr file in *natoms and *nframes.
+ * It also returns the starting position of each frame as bytes from the beginning of the file
+ * in **offsets, which has to be freed manually.
+ */
+int read_trr_header(const char* fn, int* natoms, unsigned long* nframes);
+
+/* Read one frame of an open trr file. If either of x,v,f,box are
    NULL the arrays will be read from the file but not used.  */
 extern int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda,
                     matrix box, rvec* x, rvec* v, rvec* f);
 
-/* Write a frame to xtc file */
+/* Write a frame to trr file */
 extern int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
                      matrix box, rvec* x, rvec* v, rvec* f);
 

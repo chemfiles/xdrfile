@@ -94,7 +94,14 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
     char buf[BUFSIZE];
 
     if (xdrfile_read_int(&magic, 1, xd) != 1) {
-        return exdrINT;
+        if (bRead) {
+            return exdrENDOFFILE;
+        } else {
+            return exdrINT;
+        }
+    }
+    if (magic != GROMACS_MAGIC) {
+        return exdrMAGIC;
     }
 
     if (bRead) {

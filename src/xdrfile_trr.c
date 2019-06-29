@@ -499,6 +499,38 @@ int read_trr_natoms(const char* fn, int* natoms) {
     return exdrOK;
 }
 
+int read_trr_header(const char* fn, int* natoms, unsigned long* nframes) {
+    XDRFILE* xd;
+    int result, step;
+    float time, lambda;
+    *nframes = 0;
+
+    read_trr_natoms(fn, natoms);
+
+    xd = xdrfile_open(fn, "r");
+    if (NULL == xd) {
+        return exdrFILENOTFOUND;
+    }
+
+    while (1) {
+        // box, x, v, f are NULL to skip branches in `do_htrn`
+        result = read_trr(xd, *natoms, &step, &time, &lambda, NULL, NULL, NULL, NULL);
+        if (result != exdrOK) {
+            break;
+        }
+        (*nframes)++;
+    }
+
+    xdrfile_close(xd);
+
+    if (result != exdrENDOFFILE) {
+        // report error to caller
+        return result;
+    }
+
+    return exdrOK;
+}
+
 int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
               matrix box, rvec* x, rvec* v, rvec* f) {
     return do_trn(xd, 0, &step, &t, &lambda, box, &natoms, x, v, f);

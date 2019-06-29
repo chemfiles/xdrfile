@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 2.8.12)
 
 project(xdrfile C)
 
+if (POLICY CMP0063)
+    # Use of `<LANG>_VISIBILITY_PRESET` in OBJECT libraries
+    cmake_policy(SET CMP0063 NEW)
+endif()
+
 set(SOURCES
     src/xdrfile.c
     src/xdrfile_trr.c

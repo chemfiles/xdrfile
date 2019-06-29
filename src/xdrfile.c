@@ -667,6 +667,7 @@ int xdrfile_decompress_coord_float(float* ptr, int* size, float* precision,
     float *lfp, inv_precision;
     int tmp, *thiscoord, prevcoord[3];
     unsigned int bitsize;
+    const float* ptrstart = ptr;
 
     bitsizeint[0] = 0;
     bitsizeint[1] = 0;
@@ -787,6 +788,10 @@ int xdrfile_decompress_coord_float(float* ptr, int* size, float* precision,
             run -= is_smaller;
             is_smaller--;
         }
+        if ((lfp - ptrstart) + run > size3) {
+            fprintf(stderr, "Buffer overrun during decompression.\n");
+            return -1;
+        }
         if (run > 0) {
             thiscoord += 3;
             for (k = 0; k < run; k += 3) {
@@ -839,6 +844,10 @@ int xdrfile_decompress_coord_float(float* ptr, int* size, float* precision,
             smallnum = magicints[smallidx] / 2;
         }
         sizesmall[0] = sizesmall[1] = sizesmall[2] = magicints[smallidx];
+        if (sizesmall[0] == 0 || sizesmall[1] == 0 || sizesmall[2] == 0) {
+            fprintf(stderr, "Invalid size found in 'xdrfile_decompress_coord_float'.\n");
+            return -1;
+        }
     }
     return *size;
 }
@@ -1138,6 +1147,7 @@ int xdrfile_decompress_coord_double(double* ptr, int* size, double* precision,
     float float_prec, tmpdata[30];
     int tmp, *thiscoord, prevcoord[3];
     unsigned int bitsize;
+    const double* ptrstart = ptr;
 
     bitsizeint[0] = 0;
     bitsizeint[1] = 0;
@@ -1262,6 +1272,10 @@ int xdrfile_decompress_coord_double(double* ptr, int* size, double* precision,
             run -= is_smaller;
             is_smaller--;
         }
+        if ((lfp - ptrstart) + run > size3) {
+            fprintf(stderr, "Buffer overrun during decompression.\n");
+            return -1;
+        }
         if (run > 0) {
             thiscoord += 3;
             for (k = 0; k < run; k += 3) {
@@ -1313,6 +1327,10 @@ int xdrfile_decompress_coord_double(double* ptr, int* size, double* precision,
             smallnum = magicints[smallidx] / 2;
         }
         sizesmall[0] = sizesmall[1] = sizesmall[2] = magicints[smallidx];
+        if (sizesmall[0] == 0 || sizesmall[1] == 0 || sizesmall[2] == 0) {
+            fprintf(stderr, "Invalid size found in 'xdrfile_decompress_coord_double'.\n");
+            return -1;
+        }
     }
     return *size;
 }

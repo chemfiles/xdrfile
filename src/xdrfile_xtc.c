@@ -98,7 +98,7 @@ static int xtc_coord(
     return exdrOK;
 }
 
-int read_xtc_natoms(char* fn, int* natoms) {
+int read_xtc_natoms(const char* fn, int* natoms) {
     XDRFILE* xd;
     int step, result;
     float time;

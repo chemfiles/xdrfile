@@ -24,12 +24,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #include "xdrfile.h"
 #include "xdrfile_trr.h"
@@ -40,25 +37,25 @@
 /* This struct describes the order and the sizes of the structs
 in a trjfile, sizes are given in bytes.*/
 typedef struct {
-    mybool bDouble; /* Double precision?                    */
-    int ir_size;    /* Backward compatibility		        */
-    int e_size;     /* Backward compatibility		        */
-    int box_size;   /* Non zero if a box is present			*/
-    int vir_size;   /* Backward compatibility		        */
-    int pres_size;  /* Backward compatibility		        */
-    int top_size;   /* Backward compatibility		        */
-    int sym_size;   /* Backward compatibility		        */
-    int x_size;     /* Non zero if coordinates are present	*/
-    int v_size;     /* Non zero if velocities are present	*/
-    int f_size;     /* Non zero if forces are present		*/
+    bool use_double; /* Double precision?                    */
+    int ir_size;     /* Backward compatibility               */
+    int e_size;      /* Backward compatibility               */
+    int box_size;    /* Non zero if a box is present         */
+    int vir_size;    /* Backward compatibility               */
+    int pres_size;   /* Backward compatibility               */
+    int top_size;    /* Backward compatibility               */
+    int sym_size;    /* Backward compatibility               */
+    int x_size;      /* Non zero if coordinates are present  */
+    int v_size;      /* Non zero if velocities are present   */
+    int f_size;      /* Non zero if forces are present       */
 
-    int natoms;     /* The total number of atoms			*/
-    int step;       /* Current step number				    */
-    int nre;        /* Backward compatibility		        */
-    float tf;       /* Current time					        */
-    float lambdaf;  /* Current value of lambda			    */
-    double td;      /* Current time					        */
-    double lambdad; /* Current value of lambda			    */
+    int natoms;     /* The total number of atoms            */
+    int step;       /* Current step number                  */
+    int nre;        /* Backward compatibility               */
+    float tf;       /* Current time                         */
+    float lambdaf;  /* Current value of lambda              */
+    double td;      /* Current time                         */
+    double lambdad; /* Current value of lambda              */
 } t_trnheader;
 
 static int nFloatSize(t_trnheader* sh, int* nflsz) {
@@ -85,7 +82,7 @@ static int nFloatSize(t_trnheader* sh, int* nflsz) {
     return exdrOK;
 }
 
-static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
+static int do_trnheader(XDRFILE* xd, bool read, t_trnheader* sh) {
     int magic = GROMACS_MAGIC;
     int nflsz, slen, result;
     char* version = "GMX_trn_file";
@@ -95,7 +92,7 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
         return exdrINT;
     }
 
-    if (bRead) {
+    if (read) {
         if (xdrfile_read_int(&slen, 1, xd) != 1) {
             return exdrINT;
         }
@@ -151,7 +148,7 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
     if ((result = nFloatSize(sh, &nflsz)) != exdrOK) {
         return result;
     }
-    sh->bDouble = (nflsz == sizeof(double));
+    sh->use_double = (nflsz == sizeof(double));
 
     if (xdrfile_read_int(&sh->step, 1, xd) != 1) {
         return exdrINT;
@@ -159,7 +156,7 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
     if (xdrfile_read_int(&sh->nre, 1, xd) != 1) {
         return exdrINT;
     }
-    if (sh->bDouble) {
+    if (sh->use_double) {
         if (xdrfile_read_double(&sh->td, 1, xd) != 1) {
             return exdrDOUBLE;
         }
@@ -182,16 +179,15 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
     return exdrOK;
 }
 
-static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec* x, rvec* v,
-                   rvec* f) {
+static int do_htrn(XDRFILE* xd, bool read, t_trnheader* sh, matrix box, rvec* x, rvec* v, rvec* f) {
     double pvd[3 * 3];
     double* dx = NULL;
     float pvf[3 * 3];
     float* fx = NULL;
 
-    if (sh->bDouble) {
+    if (sh->use_double) {
         if (sh->box_size != 0) {
-            if (!bRead) {
+            if (!read) {
                 for (int i = 0; i < 3; i++) {
                     for (int j = 0; j < 3; j++) {
                         if (NULL != box) {
@@ -232,7 +228,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
             }
         }
         if (sh->x_size != 0) {
-            if (!bRead) {
+            if (!read) {
                 for (int i = 0; i < sh->natoms; i++) {
                     for (int j = 0; j < 3; j++) {
                         if (NULL != x) {
@@ -242,7 +238,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
                 }
             }
             if (xdrfile_read_double(dx, sh->natoms * 3, xd) == sh->natoms * 3) {
-                if (bRead) {
+                if (read) {
                     for (int i = 0; i < sh->natoms; i++) {
                         for (int j = 0; j < 3; j++) {
                             if (NULL != x) {
@@ -256,7 +252,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
             }
         }
         if (sh->v_size != 0) {
-            if (!bRead) {
+            if (!read) {
                 for (int i = 0; i < sh->natoms; i++) {
                     for (int j = 0; j < 3; j++) {
                         if (NULL != x) {
@@ -278,7 +274,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
             }
         }
         if (sh->f_size != 0) {
-            if (!bRead) {
+            if (!read) {
                 for (int i = 0; i < sh->natoms; i++) {
                     for (int j = 0; j < 3; j++) {
                         if (NULL != x) {
@@ -306,7 +302,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
     /* Float */
     {
         if (sh->box_size != 0) {
-            if (!bRead) {
+            if (!read) {
                 for (int i = 0; i < 3; i++) {
                     for (int j = 0; j < 3; j++) {
                         if (NULL != box) {
@@ -347,7 +343,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
             }
         }
         if (sh->x_size != 0) {
-            if (!bRead) {
+            if (!read) {
                 for (int i = 0; i < sh->natoms; i++) {
                     for (int j = 0; j < 3; j++) {
                         if (NULL != x) {
@@ -357,7 +353,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
                 }
             }
             if (xdrfile_read_float(fx, sh->natoms * 3, xd) == sh->natoms * 3) {
-                if (bRead) {
+                if (read) {
                     for (int i = 0; i < sh->natoms; i++) {
                         for (int j = 0; j < 3; j++) {
                             if (NULL != x) {
@@ -371,7 +367,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
             }
         }
         if (sh->v_size != 0) {
-            if (!bRead) {
+            if (!read) {
                 for (int i = 0; i < sh->natoms; i++) {
                     for (int j = 0; j < 3; j++) {
                         if (NULL != x) {
@@ -393,7 +389,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
             }
         }
         if (sh->f_size != 0) {
-            if (!bRead) {
+            if (!read) {
                 for (int i = 0; i < sh->natoms; i++) {
                     for (int j = 0; j < 3; j++) {
                         if (NULL != x) {
@@ -421,14 +417,14 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec*
     return exdrOK;
 }
 
-static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda, matrix box,
+static int do_trn(XDRFILE* xd, bool read, int* step, float* t, float* lambda, matrix box,
                   int* natoms, rvec* x, rvec* v, rvec* f) {
     t_trnheader* sh;
     int result;
 
     sh = (t_trnheader*)calloc(1, sizeof(*sh));
 
-    if (!bRead) {
+    if (!read) {
         sh->box_size = (NULL != box) ? sizeof(matrix) : 0;
         sh->x_size = ((NULL != x) ? (*natoms * sizeof(x[0])) : 0);
         sh->v_size = ((NULL != v) ? (*natoms * sizeof(v[0])) : 0);
@@ -441,16 +437,16 @@ static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda,
         sh->tf = *t;
         sh->lambdaf = *lambda;
     }
-    if ((result = do_trnheader(xd, bRead, sh)) != exdrOK) {
+    if ((result = do_trnheader(xd, read, sh)) != exdrOK) {
         return result;
     }
-    if (bRead) {
+    if (read) {
         *natoms = sh->natoms;
         *step = sh->step;
         *t = (float)(sh->td);
         *lambda = (float)(sh->lambdad);
     }
-    if ((result = do_htrn(xd, bRead, sh, box, x, v, f)) != exdrOK) {
+    if ((result = do_htrn(xd, read, sh, box, x, v, f)) != exdrOK) {
         return result;
     }
 
@@ -485,10 +481,10 @@ int read_trr_natoms(const char* fn, int* natoms) {
 
 int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda, matrix box, rvec* x,
               rvec* v, rvec* f) {
-    return do_trn(xd, 0, &step, &t, &lambda, box, &natoms, x, v, f);
+    return do_trn(xd, false, &step, &t, &lambda, box, &natoms, x, v, f);
 }
 
 int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda, matrix box, rvec* x,
              rvec* v, rvec* f) {
-    return do_trn(xd, 1, step, t, lambda, box, &natoms, x, v, f);
+    return do_trn(xd, true, step, t, lambda, box, &natoms, x, v, f);
 }

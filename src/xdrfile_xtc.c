@@ -24,21 +24,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xdrfile_xtc.h"
-#include "xdrfile.h"
+#include <stdbool.h>
 #include <stdlib.h>
+
+#include "xdrfile.h"
+#include "xdrfile_xtc.h"
 
 #define MAGIC 1995
 
-enum { FALSE, TRUE };
-
-static int xtc_header(XDRFILE* xd, int* natoms, int* step, float* time, mybool bRead) {
+static int xtc_header(XDRFILE* xd, int* natoms, int* step, float* time, bool read) {
     int result, magic, n = 1;
 
     /* Note: read is same as write. He he he */
     magic = MAGIC;
     if ((result = xdrfile_write_int(&magic, n, xd)) != n) {
-        if (bRead) {
+        if (read) {
             return exdrENDOFFILE;
         } else {
             return exdrINT;
@@ -60,7 +60,7 @@ static int xtc_header(XDRFILE* xd, int* natoms, int* step, float* time, mybool b
     return exdrOK;
 }
 
-static int xtc_coord(XDRFILE* xd, int* natoms, matrix box, rvec* x, float* prec, mybool bRead) {
+static int xtc_coord(XDRFILE* xd, int* natoms, matrix box, rvec* x, float* prec, bool read) {
     int result;
 
     /* box */
@@ -68,7 +68,7 @@ static int xtc_coord(XDRFILE* xd, int* natoms, matrix box, rvec* x, float* prec,
     if (3 * 3 != result) {
         return exdrFLOAT;
     } else {
-        if (bRead) {
+        if (read) {
             result = xdrfile_decompress_coord_float(x[0], natoms, prec, xd);
             if (result != *natoms) {
                 return exdr3DX;
@@ -92,7 +92,7 @@ int read_xtc_natoms(const char* fn, int* natoms) {
     if (NULL == xd) {
         return exdrFILENOTFOUND;
     }
-    result = xtc_header(xd, natoms, &step, &time, TRUE);
+    result = xtc_header(xd, natoms, &step, &time, true);
     xdrfile_close(xd);
 
     return result;
@@ -102,7 +102,7 @@ int read_xtc_natoms(const char* fn, int* natoms) {
 int read_xtc(XDRFILE* xd, int natoms, int* step, float* time, matrix box, rvec* x, float* prec) {
     int result;
 
-    if ((result = xtc_header(xd, &natoms, step, time, TRUE)) != exdrOK) {
+    if ((result = xtc_header(xd, &natoms, step, time, true)) != exdrOK) {
         return result;
     }
 
@@ -117,7 +117,7 @@ int read_xtc(XDRFILE* xd, int natoms, int* step, float* time, matrix box, rvec* 
 int write_xtc(XDRFILE* xd, int natoms, int step, float time, matrix box, rvec* x, float prec) {
     int result;
 
-    if ((result = xtc_header(xd, &natoms, &step, &time, FALSE)) != exdrOK) {
+    if ((result = xtc_header(xd, &natoms, &step, &time, false)) != exdrOK) {
         return result;
     }
 

@@ -106,7 +106,6 @@ extern char* EXDR_MESSAGE[exdrNR];
 
 typedef float matrix[3][3];
 typedef float rvec[3];
-typedef int mybool;
 
 /*! \brief Open a portable binary file, just like fopen()
  *

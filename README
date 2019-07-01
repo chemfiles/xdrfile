@@ -1,12 +1,16 @@
 # libxdrfile
 
-Fork of GROMACS libxdrfile version 1.1.4, with patches for uses within the
-chemfiles project. This version is BSD licensed.
+Fork of GROMACS libxdrfile (based on version 1.1.4), with patches for uses
+within the chemfiles project. This version is BSD licensed.
 
+Changes from the original project:
+* Fixes xdrfile [buffer overrun](https://mailman-1.sys.kth.se/pipermail/gromacs.org_gmx-developers/2014-September/007942.html) / segfault with malformed xtc files.
+* Fix floating point exception in `xdrfile.c(decodeints)`
 
-Original README below.
+* Assume availability of C99 standard and headers (`stdint.h / stdbool.h`) and
+  use them.
 
--------
+### Original README
 
 This library allows to read GROMACS trr and xtc files and also to
 convert from one format to another.

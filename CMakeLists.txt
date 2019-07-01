@@ -7,6 +7,9 @@ if (POLICY CMP0063)
     cmake_policy(SET CMP0063 NEW)
 endif()
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
 set(SOURCES
     src/xdrfile.c
     src/xdrfile_trr.c

@@ -72,10 +72,10 @@ struct XDR {
     void* x_private;
 };
 
-static int xdr_char(XDR* xdrs, char* ip);
-static int xdr_u_char(XDR* xdrs, unsigned char* ip);
-static int xdr_short(XDR* xdrs, short* ip);
-static int xdr_u_short(XDR* xdrs, unsigned short* ip);
+// static int xdr_char(XDR* xdrs, char* ip);
+// static int xdr_u_char(XDR* xdrs, unsigned char* ip);
+// static int xdr_short(XDR* xdrs, short* ip);
+// static int xdr_u_short(XDR* xdrs, unsigned short* ip);
 static int xdr_int(XDR* xdrs, int* ip);
 static int xdr_u_int(XDR* xdrs, unsigned int* ip);
 static int xdr_float(XDR* xdrs, float* ip);
@@ -209,90 +209,6 @@ int xdrfile_write_uint(unsigned int* ptr, int ndata, XDRFILE* xfp) {
 
     /* read write is encoded in the XDR struct */
     while (i < ndata && xdr_u_int((XDR*)(xfp->xdr), ptr + i)) {
-        i++;
-    }
-    return i;
-}
-
-int xdrfile_read_char(char* ptr, int ndata, XDRFILE* xfp) {
-    int i = 0;
-
-    /* read write is encoded in the XDR struct */
-    while (i < ndata && xdr_char((XDR*)(xfp->xdr), ptr + i)) {
-        i++;
-    }
-
-    return i;
-}
-
-int xdrfile_write_char(char* ptr, int ndata, XDRFILE* xfp) {
-    int i = 0;
-
-    /* read write is encoded in the XDR struct */
-    while (i < ndata && xdr_char((XDR*)(xfp->xdr), ptr + i)) {
-        i++;
-    }
-    return i;
-}
-
-int xdrfile_read_uchar(unsigned char* ptr, int ndata, XDRFILE* xfp) {
-    int i = 0;
-
-    /* read write is encoded in the XDR struct */
-    while (i < ndata && xdr_u_char((XDR*)(xfp->xdr), ptr + i)) {
-        i++;
-    }
-
-    return i;
-}
-
-int xdrfile_write_uchar(unsigned char* ptr, int ndata, XDRFILE* xfp) {
-    int i = 0;
-
-    /* read write is encoded in the XDR struct */
-    while (i < ndata && xdr_u_char((XDR*)(xfp->xdr), ptr + i)) {
-        i++;
-    }
-    return i;
-}
-
-int xdrfile_read_short(short* ptr, int ndata, XDRFILE* xfp) {
-    int i = 0;
-
-    /* read write is encoded in the XDR struct */
-    while (i < ndata && xdr_short((XDR*)(xfp->xdr), ptr + i)) {
-        i++;
-    }
-
-    return i;
-}
-
-int xdrfile_write_short(short* ptr, int ndata, XDRFILE* xfp) {
-    int i = 0;
-
-    /* read write is encoded in the XDR struct */
-    while (i < ndata && xdr_short((XDR*)(xfp->xdr), ptr + i)) {
-        i++;
-    }
-    return i;
-}
-
-int xdrfile_read_ushort(unsigned short* ptr, int ndata, XDRFILE* xfp) {
-    int i = 0;
-
-    /* read write is encoded in the XDR struct */
-    while (i < ndata && xdr_u_short((XDR*)(xfp->xdr), ptr + i)) {
-        i++;
-    }
-
-    return i;
-}
-
-int xdrfile_write_ushort(unsigned short* ptr, int ndata, XDRFILE* xfp) {
-    int i = 0;
-
-    /* read write is encoded in the XDR struct */
-    while (i < ndata && xdr_u_short((XDR*)(xfp->xdr), ptr + i)) {
         i++;
     }
     return i;
@@ -1703,69 +1619,69 @@ static int xdr_u_int(XDR* xdrs, unsigned int* up) {
     return 0;
 }
 
-static int xdr_short(XDR* xdrs, short* sp) {
-    int32_t i32;
-
-    switch (xdrs->x_op) {
-    case XDR_ENCODE:
-        i32 = (int32_t)*sp;
-        return xdr_putlong(xdrs, &i32);
-
-    case XDR_DECODE:
-        if (!xdr_getlong(xdrs, &i32)) {
-            return 0;
-        }
-        *sp = (short)i32;
-        return 1;
-
-    case XDR_FREE:
-        return 1;
-    }
-    return 0;
-}
-
-static int xdr_u_short(XDR* xdrs, unsigned short* sp) {
-    uint32_t ui32;
-
-    switch (xdrs->x_op) {
-    case XDR_ENCODE:
-        ui32 = (uint32_t)*sp;
-        return xdr_putlong(xdrs, (int32_t*)&ui32);
-
-    case XDR_DECODE:
-        if (!xdr_getlong(xdrs, (int32_t*)&ui32)) {
-            return 0;
-        }
-        *sp = (unsigned short)ui32;
-        return 1;
-
-    case XDR_FREE:
-        return 1;
-    }
-    return 0;
-}
-
-static int xdr_char(XDR* xdrs, char* cp) {
-    int i;
-
-    i = (*cp);
-    if (!xdr_int(xdrs, &i)) {
-        return 0;
-    }
-    *cp = (char)i;
-    return 1;
-}
-
-static int xdr_u_char(XDR* xdrs, unsigned char* cp) {
-    unsigned int u;
-
-    u = (*cp);
-    if (!xdr_u_int(xdrs, &u)) {
-        return 0;
-    }
-    *cp = (unsigned char)u;
-    return 1;
-}
+// static int xdr_short(XDR* xdrs, short* sp) {
+//     int32_t i32;
+//
+//     switch (xdrs->x_op) {
+//     case XDR_ENCODE:
+//         i32 = (int32_t)*sp;
+//         return xdr_putlong(xdrs, &i32);
+//
+//     case XDR_DECODE:
+//         if (!xdr_getlong(xdrs, &i32)) {
+//             return 0;
+//         }
+//         *sp = (short)i32;
+//         return 1;
+//
+//     case XDR_FREE:
+//         return 1;
+//     }
+//     return 0;
+// }
+//
+// static int xdr_u_short(XDR* xdrs, unsigned short* sp) {
+//     uint32_t ui32;
+//
+//     switch (xdrs->x_op) {
+//     case XDR_ENCODE:
+//         ui32 = (uint32_t)*sp;
+//         return xdr_putlong(xdrs, (int32_t*)&ui32);
+//
+//     case XDR_DECODE:
+//         if (!xdr_getlong(xdrs, (int32_t*)&ui32)) {
+//             return 0;
+//         }
+//         *sp = (unsigned short)ui32;
+//         return 1;
+//
+//     case XDR_FREE:
+//         return 1;
+//     }
+//     return 0;
+// }
+//
+// static int xdr_char(XDR* xdrs, char* cp) {
+//     int i;
+//
+//     i = (*cp);
+//     if (!xdr_int(xdrs, &i)) {
+//         return 0;
+//     }
+//     *cp = (char)i;
+//     return 1;
+// }
+//
+// static int xdr_u_char(XDR* xdrs, unsigned char* cp) {
+//     unsigned int u;
+//
+//     u = (*cp);
+//     if (!xdr_u_int(xdrs, &u)) {
+//         return 0;
+//     }
+//     *cp = (unsigned char)u;
+//     return 1;
+// }
 
 /*
  * XDR opaque data

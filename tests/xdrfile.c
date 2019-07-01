@@ -51,9 +51,6 @@ int main(void) {
     int len, ncoord = BUFLEN / 3;
     char ptr[BUFLEN], *buf = "abcdefghijklmnopqrstuvwxyz";
     char* testfn = "test.xdr";
-    unsigned char uptr[BUFLEN];
-    short sptr[BUFLEN], sptr2[BUFLEN];
-    unsigned short usptr[BUFLEN], usptr2[BUFLEN];
     int iptr[BUFLEN], iptr2[BUFLEN];
     unsigned int uiptr[BUFLEN], uiptr2[BUFLEN];
     float fptr[BUFLEN], fptr2[BUFLEN];
@@ -70,7 +67,6 @@ int main(void) {
         die("Increase BUFLEN");
     }
     strcpy(ptr, buf);
-    strcpy((char*)uptr, buf);
     /* Initiate float arrays */
     for (int i = 0; i < BUFLEN; i++) {
         fptr[i] = cosf(i * 13.0f / (float)M_PI);
@@ -87,18 +83,6 @@ int main(void) {
         die("Can not open file for writing");
     }
 
-    if (xdrfile_write_char(ptr, len, xfp) != len) {
-        die("Writing char string");
-    }
-    if (xdrfile_write_uchar(uptr, len, xfp) != len) {
-        die("Writing uchar string");
-    }
-    if (xdrfile_write_short(sptr, BUFLEN, xfp) != BUFLEN) {
-        die("Writing short array");
-    }
-    if (xdrfile_write_ushort(usptr, BUFLEN, xfp) != BUFLEN) {
-        die("Writing ushort array");
-    }
     if (xdrfile_write_int(iptr, BUFLEN, xfp) != BUFLEN) {
         die("Writing int array");
     }
@@ -136,36 +120,6 @@ int main(void) {
         die("Can not open file for reading");
     }
 
-    if ((xdrfile_read_char(ptr, len, xfp)) != len) {
-        die("Not the right number of chars read from string");
-    }
-    if (strcmp(ptr, buf) != 0) {
-        die("did not read the expected chars");
-    }
-    if (xdrfile_read_uchar(uptr, len, xfp) != len) {
-        die("Not the right number of uchars read from string");
-    }
-    if (strcmp((char*)uptr, buf) != 0) {
-        die("did not read the expected uchars");
-    }
-    if (xdrfile_read_short(sptr2, BUFLEN, xfp) != BUFLEN) {
-        die("Reading short array");
-    }
-    for (int i = 0; i < BUFLEN; i++) {
-        if (sptr2[i] != sptr[i]) {
-            fprintf(stderr, "i: %5d, wrote: %10d, read: %10d\n", i, sptr[i], sptr2[i]);
-            die("Comparing short array");
-        }
-    }
-    if (xdrfile_read_ushort(usptr2, BUFLEN, xfp) != BUFLEN) {
-        die("Reading ushort array");
-    }
-    for (int i = 0; i < BUFLEN; i++) {
-        if (usptr2[i] != usptr[i]) {
-            fprintf(stderr, "i: %5d, wrote: %10d, read: %10d\n", i, usptr[i], usptr2[i]);
-            die("Comparing ushort array");
-        }
-    }
     if (xdrfile_read_int(iptr2, BUFLEN, xfp) != BUFLEN) {
         die("Reading int array");
     }

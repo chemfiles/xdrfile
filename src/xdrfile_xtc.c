@@ -1,6 +1,4 @@
-/* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
- *
- * Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
+/* Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,13 +32,7 @@
 
 enum { FALSE, TRUE };
 
-static int xtc_header(
-	XDRFILE* xd,
-	int* natoms,
-	int* step,
-	float* time,
-	mybool bRead
-) {
+static int xtc_header(XDRFILE* xd, int* natoms, int* step, float* time, mybool bRead) {
     int result, magic, n = 1;
 
     /* Note: read is same as write. He he he */
@@ -68,14 +60,7 @@ static int xtc_header(
     return exdrOK;
 }
 
-static int xtc_coord(
-	XDRFILE* xd,
-	int* natoms,
-	matrix box,
-	rvec* x,
-	float* prec,
-    mybool bRead
-) {
+static int xtc_coord(XDRFILE* xd, int* natoms, matrix box, rvec* x, float* prec, mybool bRead) {
     int result;
 
     /* box */
@@ -114,15 +99,7 @@ int read_xtc_natoms(const char* fn, int* natoms) {
 }
 
 /* Read subsequent frames */
-int read_xtc(
-	XDRFILE* xd,
-	int natoms,
-	int* step,
-	float* time,
-	matrix box,
-    rvec* x,
-	float* prec
-) {
+int read_xtc(XDRFILE* xd, int natoms, int* step, float* time, matrix box, rvec* x, float* prec) {
     int result;
 
     if ((result = xtc_header(xd, &natoms, step, time, TRUE)) != exdrOK) {
@@ -137,15 +114,7 @@ int read_xtc(
 }
 
 /* Write a frame to xtc file */
-int write_xtc(
-	XDRFILE* xd,
-	int natoms,
-	int step,
-	float time,
-	matrix box,
-    rvec* x,
-	float prec
-) {
+int write_xtc(XDRFILE* xd, int natoms, int step, float time, matrix box, rvec* x, float prec) {
     int result;
 
     if ((result = xtc_header(xd, &natoms, &step, &time, FALSE)) != exdrOK) {

@@ -1,6 +1,4 @@
-/* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
- *
- * Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
+/* Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -184,8 +182,8 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
     return exdrOK;
 }
 
-static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
-                   rvec* x, rvec* v, rvec* f) {
+static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec* x, rvec* v,
+                   rvec* f) {
     double pvd[DIM * DIM];
     double* dx = NULL;
     float pvf[DIM * DIM];
@@ -244,8 +242,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 if (bRead) {
                     for (i = 0; (i < sh->natoms); i++) {
                         for (j = 0; (j < DIM); j++) {
@@ -269,8 +266,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 for (i = 0; (i < sh->natoms); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != v) {
@@ -292,8 +288,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 for (i = 0; (i < sh->natoms); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != f) {
@@ -362,8 +357,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 if (bRead) {
                     for (i = 0; (i < sh->natoms); i++) {
                         for (j = 0; (j < DIM); j++) {
@@ -387,8 +381,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 for (i = 0; (i < sh->natoms); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != v) {
@@ -410,8 +403,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 for (i = 0; (i < sh->natoms); i++) {
                     for (j = 0; (j < DIM); j++) {
                         if (NULL != f) {
@@ -430,8 +422,8 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
     return exdrOK;
 }
 
-static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda,
-                  matrix box, int* natoms, rvec* x, rvec* v, rvec* f) {
+static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda, matrix box,
+                  int* natoms, rvec* x, rvec* v, rvec* f) {
     t_trnheader* sh;
     int result;
 
@@ -492,12 +484,12 @@ int read_trr_natoms(const char* fn, int* natoms) {
     return exdrOK;
 }
 
-int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
-              matrix box, rvec* x, rvec* v, rvec* f) {
+int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda, matrix box, rvec* x,
+              rvec* v, rvec* f) {
     return do_trn(xd, 0, &step, &t, &lambda, box, &natoms, x, v, f);
 }
 
-int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda,
-             matrix box, rvec* x, rvec* v, rvec* f) {
+int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda, matrix box, rvec* x,
+             rvec* v, rvec* f) {
     return do_trn(xd, 1, step, t, lambda, box, &natoms, x, v, f);
 }

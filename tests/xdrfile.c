@@ -67,10 +67,12 @@ int main(void) {
         die("Increase BUFLEN");
     }
     strcpy(ptr, buf);
-    /* Initiate float arrays */
+    /* Initiate arrays */
     for (int i = 0; i < BUFLEN; i++) {
         fptr[i] = cosf(i * 13.0f / (float)M_PI);
         dptr[i] = sin(i * 13.0 / M_PI);
+        iptr[i] = (int)(floor(dptr[i] * 1000));
+        uiptr[i] = (unsigned int)(floor(dptr[i] * 1000) + 1001);
     }
     /* Initiate opaque array */
     memcpy(optr, dptr, BUFLEN);

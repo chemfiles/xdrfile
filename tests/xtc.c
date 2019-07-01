@@ -142,6 +142,8 @@ int main(void) {
     } while (result == exdrOK);
 
     xdrfile_close(xd);
+    free(x1);
+    free(x2);
 
     return 0;
 }

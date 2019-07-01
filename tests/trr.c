@@ -136,6 +136,8 @@ int main(void) {
     }
 
     xdrfile_close(xd);
+    free(x1);
+    free(x2);
 
     return 0;
 }

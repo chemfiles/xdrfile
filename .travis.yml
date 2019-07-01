@@ -1,0 +1,72 @@
+language: cpp
+dist: trusty
+
+linux64_addons:
+    addons: &linux64
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-4.8
+
+linux32_addons:
+    addons: &linux32
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-4.8
+        - g++-4.8-multilib
+        - linux-libc-dev:i386
+        - libc6-dev-i386
+
+matrix:
+  fast_finish: true
+  include:
+    - name: linux64 gcc
+      os: linux
+      compiler: gcc
+      addons: *linux64
+    - name: linux64 clang
+      os: linux
+      compiler: clang
+    - name: linux32 gcc
+      os: linux
+      compiler: gcc
+      addons: *linux32
+      env: ARCH=x86
+    - name: osx clang
+      os: osx
+      compiler: clang
+      osx_image: xcode8.3
+    - name: osx gcc
+      os: osx
+      compiler: gcc
+      osx_image: xcode8.3
+    - name: MSVC 64-bit
+      os: windows
+      env: CMAKE_GENERATOR="Visual Studio 14 2015 Win64"
+      filter_secrets: false
+    - name: MSVC 32-bit
+      os: windows
+      env: CMAKE_GENERATOR="Visual Studio 14 2015"
+      filter_secrets: false
+    - name: MinGW
+      os: windows
+      env: CMAKE_GENERATOR="MinGW Makefiles"
+
+before_install:
+  # Setting environement
+  - cd $TRAVIS_BUILD_DIR
+  - source scripts/setup-travis.sh
+  - $CC --version
+  - $CXX --version
+
+script:
+  - cd $TRAVIS_BUILD_DIR
+  - mkdir build && cd build
+  - echo cmake -G "${CMAKE_GENERATOR}" $CMAKE_ARGS
+  - cmake -G "${CMAKE_GENERATOR}" $CMAKE_ARGS ..
+  - echo cmake --build . --config $CMAKE_BUILD_TYPE
+  - eval cmake --build . --config $CMAKE_BUILD_TYPE
+  - ctest --output-on-failure -C $CMAKE_BUILD_TYPE

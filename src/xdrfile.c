@@ -50,36 +50,10 @@ char* EXDR_MESSAGE[exdrNR] = {
 };
 
 /*
- * Declare our own XDR routines statically if no libraries are present.
+ * Declare our own XDR routines.
  * Actual implementation is at the end of this file.
- *
- * We don't want the low-level XDR implementation as part of the Gromacs
- * documentation, so skip it for doxygen too...
  */
-#if (!defined HAVE_RPC_XDR_H && !defined DOXYGEN)
-
 enum xdr_op { XDR_ENCODE = 0, XDR_DECODE = 1, XDR_FREE = 2 };
-
-/* We need integer types that are guaranteed to be 4 bytes wide.
- * If ANSI C99 headers were included they are already defined
- * as int32_t and uint32_t. Check, and if not define them ourselves.
- * Since it is just our workaround for missing ANSI C99 types, avoid adding
- * it to the doxygen documentation.
- */
-#if !(defined INT32_MAX || defined DOXYGEN)
-#if (INT_MAX == 2147483647)
-#define int32_t int
-#define uint32_t unsigned int
-#define INT32_MAX 2147483647
-#elif (LONG_MAX == 2147483647)
-#define int32_t long
-#define uint32_t unsigned long
-#define INT32_MAX 2147483647L
-#else
-#error ERROR: No 32 bit wide integer type found!
-#error Use system XDR libraries instead, or update xdrfile.c
-#endif
-#endif
 
 typedef struct XDR XDR;
 
@@ -117,7 +91,6 @@ static void xdrstdio_create(XDR* xdrs, FILE* fp, enum xdr_op xop);
         if ((xdrs)->x_ops->x_destroy)                                                              \
             (*(xdrs)->x_ops->x_destroy)(xdrs);                                                     \
     } while (0)
-#endif /* end of our own XDR declarations */
 
 /** Contents of the abstract XDRFILE data structure.
  *

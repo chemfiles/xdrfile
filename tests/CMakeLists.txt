@@ -9,6 +9,10 @@ function(create_test _file_)
     endif()
 
     add_test(${_name_} ${_name_})
+
+    if (MSVC)
+        target_compile_definitions(${_name_} PRIVATE "_CRT_SECURE_NO_WARNINGS")
+    endif()
 endfunction()
 
 create_test(xdrfile.c)

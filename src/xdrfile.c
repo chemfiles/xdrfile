@@ -361,7 +361,7 @@ int xdrfile_write_double(double* ptr, int ndata, XDRFILE* xfp) {
     return i;
 }
 
-size_t xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp) {
+int xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp) {
     size_t i;
     if (xdr_string((XDR*)(xfp->xdr), &ptr, maxlen)) {
         i = 0;
@@ -371,18 +371,18 @@ size_t xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp) {
         if (i == maxlen) {
             return maxlen;
         } else {
-            return i + 1;
+            return (int)(i + 1);
         }
     } else {
         return 0;
     }
 }
 
-size_t xdrfile_write_string(char* ptr, XDRFILE* xfp) {
+int xdrfile_write_string(char* ptr, XDRFILE* xfp) {
     size_t len = strlen(ptr) + 1;
 
     if (xdr_string((XDR*)(xfp->xdr), &ptr, (unsigned int)len)) {
-        return len;
+        return (int)len;
     } else {
         return 0;
     }

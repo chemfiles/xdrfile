@@ -68,8 +68,6 @@
 #ifndef XDRFILE_H
 #define XDRFILE_H
 
-#include <stddef.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -340,7 +338,7 @@ int xdrfile_write_double(double* ptr, int ndata, XDRFILE* xfp);
  *
  *  \return        Number of characters read, including end-of-string
  */
-size_t xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp);
+int xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp);
 
 /*! \brief Write a string (array of characters)
  *
@@ -349,7 +347,7 @@ size_t xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp);
  *
  *  \return        Number of characters written, including end-of-string
  */
-size_t xdrfile_write_string(char* ptr, XDRFILE* xfp);
+int xdrfile_write_string(char* ptr, XDRFILE* xfp);
 
 /*! \brief Read raw bytes from file (unknown datatype)
  *

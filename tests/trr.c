@@ -50,7 +50,7 @@ static void _die_r(char* msg, int result, int line, char* file) {
 int main(void) {
     char* testfn = "test.trr";
     XDRFILE* xd;
-    int result, i, j, k, nframes = 13;
+    int result, nframes = 13;
     int natoms2, natoms1 = 173;
     int step2, step1 = 1993;
     float time2, time1 = 1097.23f;
@@ -58,8 +58,8 @@ int main(void) {
     rvec *x2, *x1;
     float lambda2, lambda1 = 0.4f;
 
-    for (i = 0; (i < DIM); i++) {
-        for (j = 0; (j < DIM); j++) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
             box1[i][j] = (i + 1) * 3.7f + (j + 1);
         }
     }
@@ -68,8 +68,8 @@ int main(void) {
         die("Allocating memory for x1 in test_xtc");
     }
 
-    for (i = 0; (i < natoms1); i++) {
-        for (j = 0; (j < DIM); j++) {
+    for (int i = 0; i < natoms1; i++) {
+        for (int j = 0; j < 3; j++) {
             x1[i][j] = (i + 1) * 3.7f + (j + 1);
         }
     }
@@ -77,7 +77,7 @@ int main(void) {
     if (NULL == xd) {
         die("Opening trr file for writing");
     }
-    for (k = 0; (k < nframes); k++) {
+    for (int k = 0; k < nframes; k++) {
         result = write_trr(xd, natoms1, step1 + k, time1 + k, lambda1, box1, x1, NULL, NULL);
         if (0 != result) {
             die_r("Writing trr file", result);
@@ -102,7 +102,7 @@ int main(void) {
         die("Opening trr file for reading");
     }
 
-    for (k = 0; (k < nframes); k++) {
+    for (int k = 0; k < nframes; k++) {
         result = read_trr(xd, natoms2, &step2, &time2, &lambda2, box2, x2, NULL, NULL);
         if (exdrOK != result) {
             die_r("read_trr", result);
@@ -119,15 +119,15 @@ int main(void) {
         if (fabsf(lambda2 - lambda2) > EPSILON) {
             die("incorrect lambda");
         }
-        for (i = 0; (i < DIM); i++) {
-            for (j = 0; (j < DIM); j++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
                 if (fabsf(box2[i][j] - box1[i][j]) > EPSILON) {
                     die("box incorrect");
                 }
             }
         }
-        for (i = 0; (i < natoms1); i++) {
-            for (j = 0; (j < DIM); j++) {
+        for (int i = 0; i < natoms1; i++) {
+            for (int j = 0; j < 3; j++) {
                 if (fabsf(x2[i][j] - x1[i][j]) > EPSILON) {
                     die("x incorrect");
                 }

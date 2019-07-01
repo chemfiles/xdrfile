@@ -104,9 +104,8 @@ enum {
 
 extern char* EXDR_MESSAGE[exdrNR];
 
-#define DIM 3
-typedef float matrix[DIM][DIM];
-typedef float rvec[DIM];
+typedef float matrix[3][3];
+typedef float rvec[3];
 typedef int mybool;
 
 /*! \brief Open a portable binary file, just like fopen()

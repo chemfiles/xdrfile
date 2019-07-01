@@ -48,7 +48,7 @@ static void _die(char* msg, int line, char* file) {
 
 int main(void) {
     XDRFILE* xfp;
-    int i, j, k, len, ncoord = BUFLEN / 3;
+    int len, ncoord = BUFLEN / 3;
     char ptr[BUFLEN], *buf = "abcdefghijklmnopqrstuvwxyz";
     char* testfn = "test.xdr";
     unsigned char uptr[BUFLEN];
@@ -72,7 +72,7 @@ int main(void) {
     strcpy(ptr, buf);
     strcpy((char*)uptr, buf);
     /* Initiate float arrays */
-    for (i = 0; (i < BUFLEN); i++) {
+    for (int i = 0; i < BUFLEN; i++) {
         fptr[i] = cosf(i * 13.0f / (float)M_PI);
         dptr[i] = sin(i * 13.0 / M_PI);
     }
@@ -117,7 +117,7 @@ int main(void) {
     if (xdrfile_write_opaque(optr, BUFLEN, xfp) != BUFLEN) {
         die("Writing opaque");
     }
-    for (k = 0; (k < NPREC); k++) {
+    for (int k = 0; k < NPREC; k++) {
         if (xdrfile_compress_coord_float(fptr, ncoord, fprec[k], xfp) != ncoord) {
             die("Writing compress_coord_float");
         }
@@ -151,7 +151,7 @@ int main(void) {
     if (xdrfile_read_short(sptr2, BUFLEN, xfp) != BUFLEN) {
         die("Reading short array");
     }
-    for (i = 0; (i < BUFLEN); i++) {
+    for (int i = 0; i < BUFLEN; i++) {
         if (sptr2[i] != sptr[i]) {
             fprintf(stderr, "i: %5d, wrote: %10d, read: %10d\n", i, sptr[i], sptr2[i]);
             die("Comparing short array");
@@ -160,7 +160,7 @@ int main(void) {
     if (xdrfile_read_ushort(usptr2, BUFLEN, xfp) != BUFLEN) {
         die("Reading ushort array");
     }
-    for (i = 0; (i < BUFLEN); i++) {
+    for (int i = 0; i < BUFLEN; i++) {
         if (usptr2[i] != usptr[i]) {
             fprintf(stderr, "i: %5d, wrote: %10d, read: %10d\n", i, usptr[i], usptr2[i]);
             die("Comparing ushort array");
@@ -169,7 +169,7 @@ int main(void) {
     if (xdrfile_read_int(iptr2, BUFLEN, xfp) != BUFLEN) {
         die("Reading int array");
     }
-    for (i = 0; (i < BUFLEN); i++) {
+    for (int i = 0; i < BUFLEN; i++) {
         if (iptr2[i] != iptr[i]) {
             fprintf(stderr, "i: %5d, wrote: %10d, read: %10d\n", i, iptr[i], iptr2[i]);
             die("Comparing int array");
@@ -178,7 +178,7 @@ int main(void) {
     if (xdrfile_read_uint(uiptr2, BUFLEN, xfp) != BUFLEN) {
         die("Reading uint array");
     }
-    for (i = 0; (i < BUFLEN); i++) {
+    for (int i = 0; i < BUFLEN; i++) {
         if (uiptr2[i] != uiptr[i]) {
             fprintf(stderr, "i: %5d, wrote: %10d, read: %10d\n", i, uiptr[i], uiptr2[i]);
             die("Comparing uint array");
@@ -187,7 +187,7 @@ int main(void) {
     if (xdrfile_read_float(fptr2, BUFLEN, xfp) != BUFLEN) {
         die("Reading float array");
     }
-    for (i = 0; (i < BUFLEN); i++) {
+    for (int i = 0; i < BUFLEN; i++) {
         if (fptr2[i] != fptr[i]) {
             fprintf(stderr, "i: %5d, wrote: %12g, read: %12g\n", i, fptr[i], fptr2[i]);
             die("Comparing float array");
@@ -196,7 +196,7 @@ int main(void) {
     if (xdrfile_read_double(dptr2, BUFLEN, xfp) != BUFLEN) {
         die("Reading double array");
     }
-    for (i = 0; (i < BUFLEN); i++) {
+    for (int i = 0; i < BUFLEN; i++) {
         if (dptr2[i] != dptr[i]) {
             fprintf(stderr, "i: %5d, wrote: %12g, read: %12g\n", i, dptr[i], dptr2[i]);
             die("Comparing double array");
@@ -211,13 +211,13 @@ int main(void) {
     if (xdrfile_read_opaque(optr2, BUFLEN, xfp) != BUFLEN) {
         die("Reading opaque array");
     }
-    for (i = 0; (i < BUFLEN); i++) {
+    for (int i = 0; i < BUFLEN; i++) {
         if (optr2[i] != optr[i]) {
             fprintf(stderr, "i: %5d, wrote: %2d, read: %2d\n", i, optr[i], optr2[i]);
             die("Comparing opaque array");
         }
     }
-    for (k = 0; (k < NPREC); k++) {
+    for (int k = 0; k < NPREC; k++) {
         float ff, fx;
         double dd, dx;
         int nc = ncoord;
@@ -232,8 +232,8 @@ int main(void) {
             ff = 1000;
         }
 
-        for (i = 0; (i < ncoord); i++) {
-            for (j = 0; (j < 3); j++) {
+        for (int i = 0; i < ncoord; i++) {
+            for (int j = 0; j < 3; j++) {
                 fx = rintf(fptr[3 * i + j] * ff) / ff;
                 if (fabsf(fx - fptr2[3 * i + j]) > EPSILON_1) {
                     fprintf(stderr, "prec: %10g, i: %3d, j: %d, fx: %10g, fptr2: %12g, fptr: %12g\n", ff, i,
@@ -250,8 +250,8 @@ int main(void) {
             die("Double precision");
         }
 
-        for (i = 0; (i < ncoord); i++) {
-            for (j = 0; (j < 3); j++) {
+        for (int i = 0; i < ncoord; i++) {
+            for (int j = 0; j < 3; j++) {
                 dx = rint(dptr[3 * i + j] * dd) / dd;
                 if (fabs(dx - dptr2[3 * i + j]) > EPSILON_2) {
                     fprintf(stderr, "prec: %10g, i: %3d, j: %d, dx: %10g, dptr2: %12g, dptr: "

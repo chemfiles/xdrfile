@@ -64,8 +64,8 @@ static int xtc_coord(XDRFILE* xd, int* natoms, matrix box, rvec* x, float* prec,
     int result;
 
     /* box */
-    result = xdrfile_read_float(box[0], DIM * DIM, xd);
-    if (DIM * DIM != result) {
+    result = xdrfile_read_float(box[0], 3 * 3, xd);
+    if (3 * 3 != result) {
         return exdrFLOAT;
     } else {
         if (bRead) {

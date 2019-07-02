@@ -251,7 +251,7 @@ int xdrfile_write_double(double* ptr, int ndata, XDRFILE* xfp) {
 }
 
 int xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp) {
-    size_t i;
+    int i;
     if (xdr_string((XDR*)(xfp->xdr), &ptr, maxlen)) {
         i = 0;
         while (i < maxlen && ptr[i] != 0) {
@@ -260,7 +260,7 @@ int xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp) {
         if (i == maxlen) {
             return maxlen;
         } else {
-            return (int)(i + 1);
+            return i + 1;
         }
     } else {
         return 0;
@@ -268,9 +268,9 @@ int xdrfile_read_string(char* ptr, int maxlen, XDRFILE* xfp) {
 }
 
 int xdrfile_write_string(char* ptr, XDRFILE* xfp) {
-    size_t len = strlen(ptr) + 1;
+    unsigned len = (unsigned)strlen(ptr) + 1;
 
-    if (xdr_string((XDR*)(xfp->xdr), &ptr, (unsigned int)len)) {
+    if (xdr_string((XDR*)(xfp->xdr), &ptr, len)) {
         return (int)len;
     } else {
         return 0;
@@ -577,7 +577,7 @@ int xdrfile_decompress_coord_float(float* ptr, int* size, float* precision, XDRF
             return -1;
         }
         xfp->buf1size = size3;
-        xfp->buf2size = (int)(size3 * 1.2);
+        xfp->buf2size = (int)(floor(size3 * 1.2));
         if ((xfp->buf2 = malloc(sizeof(int) * xfp->buf2size)) == NULL) {
             fprintf(stderr, "Cannot allocate memory for decompressing coordinates.\n");
             return -1;
@@ -761,7 +761,7 @@ int xdrfile_compress_coord_float(float* ptr, int size, float precision, XDRFILE*
             return -1;
         }
         xfp->buf1size = size3;
-        xfp->buf2size = (int)(size3 * 1.2);
+        xfp->buf2size = (int)(floor(size3 * 1.2));
         if ((xfp->buf2 = malloc(sizeof(int) * xfp->buf2size)) == NULL) {
             fprintf(stderr, "Cannot allocate memory for compressing coordinates.\n");
             return -1;
@@ -1046,7 +1046,7 @@ int xdrfile_decompress_coord_double(double* ptr, int* size, double* precision, X
             return -1;
         }
         xfp->buf1size = size3;
-        xfp->buf2size = (int)(size3 * 1.2);
+        xfp->buf2size = (int)(floor(size3 * 1.2));
         if ((xfp->buf2 = malloc(sizeof(int) * xfp->buf2size)) == NULL) {
             fprintf(stderr, "Cannot allocate memory for decompressing coordinates.\n");
             return -1;
@@ -1233,7 +1233,7 @@ int xdrfile_compress_coord_double(double* ptr, int size, double precision, XDRFI
             return -1;
         }
         xfp->buf1size = size3;
-        xfp->buf2size = (int)(size3 * 1.2);
+        xfp->buf2size = (int)(floor(size3 * 1.2));
         if ((xfp->buf2 = malloc(sizeof(int) * xfp->buf2size)) == NULL) {
             fprintf(stderr, "Cannot allocate memory for compressing coordinates.\n");
             return -1;

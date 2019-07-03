@@ -26,9 +26,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Needed for large-file seeking
+#define _LARGEFILE_SOURCE
+#define _LARGEFILE64_SOURCE
+#define _FILE_OFFSET_BITS 64
+
+#include <errno.h>
 #include <limits.h>
 #include <math.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2048,8 +2053,8 @@ static int xdrstdio_getlong(XDR*, int32_t*);
 static int xdrstdio_putlong(XDR*, int32_t*);
 static int xdrstdio_getbytes(XDR*, char*, unsigned int);
 static int xdrstdio_putbytes(XDR*, char*, unsigned int);
-static unsigned int xdrstdio_getpos(XDR*);
-static int xdrstdio_setpos(XDR*, unsigned int);
+static int64_t xdrstdio_getpos(XDR*);
+static int xdrstdio_setpos(XDR*, int64_t, int);
 static void xdrstdio_destroy(XDR*);
 
 /*
@@ -2120,11 +2125,45 @@ static int xdrstdio_putbytes(XDR* xdrs, char* addr, unsigned int len) {
     return 1;
 }
 
-/* 32 bit fileseek operations */
-static unsigned int xdrstdio_getpos(XDR* xdrs) {
-    return (unsigned int)ftell((FILE*)xdrs->x_private);
+/* 64 bit fileseek operations */
+static int64_t xdrstdio_getpos(XDR* xdrs) {
+#ifdef __CYGWIN__ /* 64 bit file access is the natural file access type for Cygwin */
+    return ftell((FILE*)xdrs->x_private);
+#elif defined(_MSC_VER) /* Microsoft C/C++ compiler */
+    return _ftelli64((FILE*)xdrs->x_private);
+#else /* __unix__ */
+    return ftello((FILE*)xdrs->x_private);
+#endif
 }
 
-static int xdrstdio_setpos(XDR* xdrs, unsigned int pos) {
-    return fseek((FILE*)xdrs->x_private, pos, 0) < 0 ? 0 : 1;
+static int xdrstdio_setpos(XDR* xdrs, int64_t pos, int whence) {
+/* A reason for failure can be filesystem limits on allocation units,
+ * before the actual off_t overflow (ext3, with a 4K clustersize,
+ * has a 16TB limit).*/
+/* We return errno relying on the fact that it is never set to 0 on
+ * success, which means that if an error occurrs it'll never be the same
+ * as exdrOK, and xdr_seek won't be confused.*/
+#ifdef __CYGWIN__ /* 64 bit file access is the natural file access type for Cygwin */
+    return fseek((FILE*)xdrs->x_private) < 0 ? errno : exdrOK;
+#elif defined(_MSC_VER) /* Microsoft C/C++ compiler */
+    return _fseeki64((FILE*)xdrs->x_private, pos, whence) < 0 ? errno : exdrOK;
+#else /*  __unix__ */
+    return fseeko((FILE*)xdrs->x_private, pos, whence) < 0 ? errno : exdrOK;
+#endif
+}
+
+int64_t xdr_tell(XDRFILE* xd)
+/* Reads position in file */
+{
+    return (int64_t)xdrstdio_getpos(xd->xdr);
+}
+
+int xdr_seek(XDRFILE* xd, int64_t pos, int whence)
+/* Seeks to position in file */
+{
+    int result;
+    if ((result = xdrstdio_setpos(xd->xdr, (int64_t)pos, whence)) != 0)
+        return result;
+
+    return exdrOK;
 }

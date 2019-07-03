@@ -69,6 +69,7 @@
 #define XDRFILE_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -504,6 +505,9 @@ int xdrfile_compress_coord_double(
 int xdrfile_decompress_coord_double(
 	double* ptr, int* ncoord, double* precision, XDRFILE* xfp
 );
+
+int64_t xdr_tell(XDRFILE* xd);
+int xdr_seek(XDRFILE* xd, int64_t pos, int whence);
 
 #ifdef __cplusplus
 }

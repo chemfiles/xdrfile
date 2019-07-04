@@ -499,9 +499,9 @@ int read_trr_natoms(const char* fn, int* natoms) {
     return exdrOK;
 }
 
-int read_trr_header(const char* fn, int* natoms, unsigned long* nframes) {
+int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t** offsets) {
     XDRFILE* xd;
-    int result, step;
+    int result, est_nframes, step;
     float time, lambda;
     *nframes = 0;
 
@@ -512,13 +512,37 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes) {
         return exdrFILENOTFOUND;
     }
 
+    est_nframes = 16;
+
+    *offsets = malloc(sizeof(int64_t) * est_nframes);
+    if (*offsets == NULL) {
+        // failed to allocate memory for `offsets`
+        xdrfile_close(xd);
+        return exdrNOMEM;
+    }
+    (*offsets)[0] = 0;
+
     while (1) {
         // box, x, v, f are NULL to skip branches in `do_htrn`
         result = read_trr(xd, *natoms, &step, &time, &lambda, NULL, NULL, NULL, NULL);
         if (result != exdrOK) {
             break;
         }
+
         (*nframes)++;
+
+        if (*nframes == est_nframes) {
+            // grow the array exponentially
+            est_nframes += est_nframes * 2;
+            *offsets = realloc(*offsets, sizeof(int64_t) * est_nframes);
+            if (*offsets == NULL) {
+                // failed to allocate memory for `offsets`
+                result = exdrNOMEM;
+                break;
+            }
+        }
+
+        (*offsets)[*nframes] = xdr_tell(xd);
     }
 
     xdrfile_close(xd);

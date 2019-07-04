@@ -113,9 +113,9 @@ int read_xtc_natoms(const char* fn, int* natoms) {
     return result;
 }
 
-int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes) {
+int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t** offsets) {
     XDRFILE* xd;
-    int result, step;
+    int result, est_nframes, step;
     float time;
     matrix box;
     rvec* x;
@@ -130,12 +130,36 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes) {
         return exdrFILENOTFOUND;
     }
 
+    est_nframes = 16;
+
+    *offsets = malloc(sizeof(int64_t) * est_nframes);
+    if (*offsets == NULL) {
+        // failed to allocate memory for `offsets`
+        xdrfile_close(xd);
+        return exdrNOMEM;
+    }
+    (*offsets)[0] = 0;
+
     while (1) {
         result = read_xtc(xd, *natoms, &step, &time, box, x, &prec);
         if (result != exdrOK) {
             break;
         }
+
         (*nframes)++;
+
+        if (*nframes == est_nframes) {
+            // grow the array exponentially
+            est_nframes += est_nframes * 2;
+            *offsets = realloc(*offsets, sizeof(int64_t) * est_nframes);
+            if (*offsets == NULL) {
+                // failed to allocate memory for `offsets`
+                result = exdrNOMEM;
+                break;
+            }
+        }
+
+        (*offsets)[*nframes] = xdr_tell(xd);
     }
 
     xdrfile_close(xd);

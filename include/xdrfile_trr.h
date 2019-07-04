@@ -46,7 +46,7 @@ extern int read_trr_natoms(const char* fn, int* natoms);
  * It also returns the starting position of each frame as bytes from the beginning of the file
  * in **offsets, which has to be freed manually.
  */
-int read_trr_header(const char* fn, int* natoms, unsigned long* nframes);
+int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t** offsets);
 
 /* Read one frame of an open trr file. If either of x,v,f,box are
    NULL the arrays will be read from the file but not used.  */

@@ -57,6 +57,23 @@ extern int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda,
 extern int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
                      matrix box, rvec* x, rvec* v, rvec* f);
 
+/* Minimum TRR header size.
+ *  > int(4) magic
+ *  > int(4) slen
+ *  > string version = uint(4) n + bytes(n)
+ *  > 10xint(4) ir_size, e_size, box_size, vir_size, pres_size,
+ *               top_size, sym_size, x_size, v_size, f_size
+ *  > int(4) natoms
+ *  > int(4) step
+ *  > int(4) nre
+ *  > float(4)/double(8) t
+ *  > float(4)/double(8) lamda
+ * For an empty version string (n=0) this adds up to 72 bytes.
+ * Default version string is "GMX_trn_file" with n=12, so 84 bytes are typical.
+ * It can have 8 bytes more if we have double time and lambda.
+ */
+#define TRR_MIN_HEADER_SIZE 72
+
 #ifdef __cplusplus
 }
 #endif

@@ -26,6 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -499,9 +500,16 @@ int read_trr_natoms(const char* fn, int* natoms) {
     return exdrOK;
 }
 
+int calc_framebytes(t_trnheader* sh) {
+    return sh->ir_size + sh->e_size + sh->box_size + sh->vir_size + sh->pres_size + sh->top_size +
+           sh->sym_size + sh->x_size + sh->v_size + sh->f_size;
+}
+
 int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t** offsets) {
     XDRFILE* xd;
-    int result, est_nframes, step;
+    t_trnheader sh;
+    int result, est_nframes, step, framebytes;
+    int64_t filesize;
     float time, lambda;
     *nframes = 0;
 
@@ -512,8 +520,27 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
         return exdrFILENOTFOUND;
     }
 
-    est_nframes = 16;
+    // Go to file end
+    if (xdr_seek(xd, 0L, SEEK_END) != exdrOK) {
+        xdrfile_close(xd);
+        return exdrNR;
+    }
+    // Cursor position is equivalent to file size
+    filesize = xdr_tell(xd);
+    // Go back to beginning
+    if (xdr_seek(xd, 0L, SEEK_SET) != exdrOK) {
+        xdrfile_close(xd);
+        return exdrNR;
+    }
+    if ((result = do_trnheader(xd, 1, &sh)) != exdrOK) {
+        xdrfile_close(xd);
+        return result;
+    }
+    framebytes = calc_framebytes(&sh);
+    est_nframes = (int)(filesize / ((int64_t)(framebytes + TRR_MIN_HEADER_SIZE)) +
+                        1); // must be at least 1 for successful growth
 
+    // Allocate memory for the frame index array
     *offsets = malloc(sizeof(int64_t) * est_nframes);
     if (*offsets == NULL) {
         // failed to allocate memory for `offsets`
@@ -523,8 +550,8 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
     (*offsets)[0] = 0;
 
     while (1) {
-        // box, x, v, f are NULL to skip branches in `do_htrn`
-        result = read_trr(xd, *natoms, &step, &time, &lambda, NULL, NULL, NULL, NULL);
+        // Skip `framebytes`
+        result = xdr_seek(xd, (int64_t)(framebytes), SEEK_CUR);
         if (result != exdrOK) {
             break;
         }
@@ -542,7 +569,15 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
             }
         }
 
+        // Store position in `offsets`
         (*offsets)[*nframes] = xdr_tell(xd);
+
+        // Read header and calculate how much to skip next time
+        result = do_trnheader(xd, 1, &sh);
+        if (result != exdrOK) {
+            break;
+        }
+        framebytes = calc_framebytes(&sh);
     }
 
     xdrfile_close(xd);

@@ -897,7 +897,7 @@ int xdrfile_compress_coord_float(float* ptr, int size, float precision,
     if (xdrfile_write_int(&size, 1, xfp) == 0) {
         return -1; /* return if we could not write size */
     }
-    /* Dont bother with compression for three atoms or less */
+    /* Dont bother with compression for nine atoms or less */
     if (size <= 9) {
         return xdrfile_write_float(ptr, size3, xfp) / 3;
         /* return number of coords, not floats */

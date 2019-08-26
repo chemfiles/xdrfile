@@ -57,6 +57,31 @@ extern int read_xtc(XDRFILE* xd, int natoms, int* step, float* time, matrix box,
 extern int write_xtc(XDRFILE* xd, int natoms, int step, float time, matrix box,
                      rvec* x, float prec);
 
+/* XTC small header size (natoms<=9).
+ *  > int(4) magic
+ *  > int(4) natoms
+ *  > int(4) step
+ *  > float(4) time
+ *  > 9xfloat(4) box
+ *  > int(4) natoms (again)
+ */
+#define XTC_SMALL_HEADER_SIZE 56
+
+/* Size of uncompressed coordinates for one atom.
+ * 3xfloat(4) x
+ */
+#define XTC_SMALL_COORDS_SIZE 12
+
+/* XTC header size (natoms>=10).
+ * Compressed trajectories contain some additional values:
+ *  > float(4) preccission
+ *  > 3xint(4) minint
+ *  > 3xint(4) maxint
+ *  > int(4) smallidx
+ * See `xdrfile_compress_coord_double()`.
+ */
+#define XTC_HEADER_SIZE (XTC_SMALL_HEADER_SIZE + 32)
+
 #ifdef __cplusplus
 }
 #endif

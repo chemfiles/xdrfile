@@ -37,7 +37,7 @@
 #include "xdrfile_trr.h"
 
 #define BUFSIZE 128
-#define GROMACS_MAGIC 1993
+#define TRR_MAGIC 1993
 
 /* This struct describes the order and the sizes of the structs
 in a trjfile, sizes are given in bytes.*/
@@ -88,7 +88,7 @@ static int nFloatSize(t_trnheader* sh, int* nflsz) {
 }
 
 static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
-    int magic = GROMACS_MAGIC;
+    int magic = TRR_MAGIC;
     int nflsz, slen, result;
     char* version = "GMX_trn_file";
     char buf[BUFSIZE];
@@ -100,7 +100,7 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
             return exdrINT;
         }
     }
-    if (magic != GROMACS_MAGIC) {
+    if (magic != TRR_MAGIC) {
         return exdrMAGIC;
     }
 

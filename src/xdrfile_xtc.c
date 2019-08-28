@@ -30,7 +30,7 @@
 #include "xdrfile.h"
 #include <stdlib.h>
 
-#define MAGIC 1995
+#define XTC_MAGIC 1995
 
 enum { FALSE, TRUE };
 
@@ -44,7 +44,7 @@ static int xtc_header(
     int result, magic, n = 1;
 
     /* Note: read is same as write. He he he */
-    magic = MAGIC;
+    magic = XTC_MAGIC;
     if ((result = xdrfile_write_int(&magic, n, xd)) != n) {
         if (bRead) {
             return exdrENDOFFILE;
@@ -52,7 +52,7 @@ static int xtc_header(
             return exdrINT;
         }
     }
-    if (magic != MAGIC) {
+    if (magic != XTC_MAGIC) {
         return exdrMAGIC;
     }
     if ((result = xdrfile_write_int(natoms, n, xd)) != n) {

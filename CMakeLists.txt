@@ -29,4 +29,7 @@ if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 
     add_test(xdrfile xdrfile_test)
+    if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/test_data")
+        file(COPY test_data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
 endif()

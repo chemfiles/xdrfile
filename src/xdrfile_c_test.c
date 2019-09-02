@@ -531,6 +531,145 @@ static void test_basic()
 	printf(" PASSED\n");
 }
 
+static void test_trr_offsets() {
+    const char* testfn = "../test_data/traj_n3.trr";
+    int result = 0;
+    int natoms = 0;
+    unsigned long nframes = 0;
+    int64_t* offsets = NULL;
+    const int natoms_ref = 3;
+    const unsigned long nframes_ref = 101;
+    const int64_t framesize_ref = 156;
+
+    printf("Testing trr offset functionality: ");
+
+    result = read_trr_header(testfn, &natoms, &nframes, &offsets);
+    if (exdrOK != result) {
+        die_r("read_trr_header", result);
+    }
+
+    if (natoms != natoms_ref) {
+        printf("Found number of atoms %d, expected %d\n", natoms, natoms_ref);
+        die("Number of atoms incorrect when reading trr");
+    }
+
+    if (nframes != nframes_ref) {
+        printf("Found number of frames %lu, expected %lu\n", nframes, nframes_ref);
+        die("Number of frames incorrect when reading trr");
+    }
+
+    for (unsigned long i = 0; i < nframes; i++) {
+        if (offsets[i] != i * framesize_ref) {
+            printf("Found offsets[%lu] %ld, expected %lu\n", i, offsets[i], i * framesize_ref);
+            die("Offset incorrect when reading trr");
+        }
+    }
+
+    free(offsets);
+
+#ifdef HAVE_UNISTD
+    unlink(testfn);
+#endif
+    printf(" PASSED\n");
+}
+
+static void test_xtc_uncompressed_offsets() {
+    const char* testfn = "../test_data/traj_comp_n3.xtc";
+    int result = 0;
+    int natoms = 0;
+    unsigned long nframes = 0;
+    int64_t* offsets = NULL;
+    const int natoms_ref = 3;
+    const unsigned long nframes_ref = 101;
+    const int64_t framesize_ref = 92;
+
+    printf("Testing uncompressed xtc offset functionality: ");
+
+    result = read_xtc_header(testfn, &natoms, &nframes, &offsets);
+    if (exdrOK != result) {
+        die_r("read_xtc_header", result);
+    }
+
+    if (natoms != natoms_ref) {
+        printf("Found number of atoms %d, expected %d\n", natoms, natoms_ref);
+        die("Number of atoms incorrect when reading xtc");
+    }
+
+    if (nframes != nframes_ref) {
+        printf("Found number of frames %lu, expected %lu\n", nframes, nframes_ref);
+        die("Number of frames incorrect when reading xtc");
+    }
+
+    for (unsigned long i = 0; i < nframes; i++) {
+        if (offsets[i] != i * framesize_ref) {
+            printf("Found offsets[%lu] %ld, expected %lu\n", i, offsets[i], i * framesize_ref);
+            die("Offset incorrect when reading xtc");
+        }
+    }
+
+    free(offsets);
+
+#ifdef HAVE_UNISTD
+    unlink(testfn);
+#endif
+    printf(" PASSED\n");
+}
+
+static void test_xtc_compressed_offsets() {
+    const char* testfn = "../test_data/traj_comp_n11.xtc";
+    XDRFILE* xd;
+    int magic = 0;
+    int result = 0;
+    int natoms = 0;
+    unsigned long nframes = 0;
+    int64_t* offsets = NULL;
+    const int natoms_ref = 11;
+    const unsigned long nframes_ref = 101;
+    const int magic_ref = 1995;
+
+    printf("Testing compressed xtc offset functionality: ");
+
+    result = read_xtc_header(testfn, &natoms, &nframes, &offsets);
+    if (exdrOK != result) {
+        die_r("read_xtc_header", result);
+    }
+
+    if (natoms != natoms_ref) {
+        printf("Found number of atoms %d, expected %d\n", natoms, natoms_ref);
+        die("Number of atoms incorrect when reading xtc");
+    }
+
+    if (nframes != nframes_ref) {
+        printf("Found number of frames %lu, expected %lu\n", nframes, nframes_ref);
+        die("Number of frames incorrect when reading xtc");
+    }
+
+    xd = xdrfile_open(testfn, "r");
+    if (NULL == xd) {
+        die("Opening xdrfile for reading");
+    }
+
+    for (unsigned long i = 0; i < nframes; i++) {
+        xdr_seek(xd, offsets[i], SEEK_SET);
+        if (xdrfile_read_int(&magic, 1, xd) != 1) {
+            die("xdrfile_read_int");
+        }
+        if (magic != magic_ref) {
+            printf("Found magic %d, expected %d\n", magic, magic_ref);
+            die("Incorrect magic when reading xtc");
+        }
+    }
+
+    xdrfile_close(xd);
+
+    free(offsets);
+
+#ifdef HAVE_UNISTD
+    unlink(testfn);
+#endif
+    printf(" PASSED\n");
+}
+
 int main(int argc, char *argv[])
 {
 	/* Test basic stuff */
@@ -540,5 +679,14 @@ int main(int argc, char *argv[])
 
 	test_trr();
 
-	return 0;
+    /* Test offsets of trr file by comparing to hard coded framesize */
+    test_trr_offsets();
+
+    /* Test offsets of uncompressed xtc file by comparing to hard coded framesize */
+    test_xtc_uncompressed_offsets();
+
+    /* Test offsets of compressed xtc file by using seek*/
+    test_xtc_compressed_offsets();
+
+    return 0;
 }

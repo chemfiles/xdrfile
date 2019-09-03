@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 2.8.12)
 
+INCLUDE (CheckTypeSize)
+
 project(xdrfile C)
 
 if (POLICY CMP0063)
     # Use of `<LANG>_VISIBILITY_PRESET` in OBJECT libraries
     cmake_policy(SET CMP0063 NEW)
+endif()
+
+check_type_size("int" INT_SIZE)
+if (NOT "${INT_SIZE}" MATCHES "^(2|4|8|16)$") # in Bytes; 16, 32, 64, 128 bit
+    # See PR #2 for details
+    message(FATAL_ERROR "Int size ${INT_SIZE} is not supported")
 endif()
 
 set(SOURCES

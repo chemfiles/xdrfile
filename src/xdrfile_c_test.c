@@ -535,7 +535,7 @@ static void test_trr_offsets() {
     const char* testfn = "../test_data/traj_n3.trr";
     int result = 0;
     int natoms = 0;
-    unsigned long nframes = 0;
+    unsigned long i, nframes = 0;
     int64_t* offsets = NULL;
     const int natoms_ref = 3;
     const unsigned long nframes_ref = 101;
@@ -558,7 +558,7 @@ static void test_trr_offsets() {
         die("Number of frames incorrect when reading trr");
     }
 
-    for (unsigned long i = 0; i < nframes; i++) {
+    for (i = 0; i < nframes; i++) {
         if (offsets[i] != i * framesize_ref) {
             printf("Found offsets[%lu] %ld, expected %lu\n", i, offsets[i], i * framesize_ref);
             die("Offset incorrect when reading trr");
@@ -577,7 +577,7 @@ static void test_xtc_uncompressed_offsets() {
     const char* testfn = "../test_data/traj_comp_n3.xtc";
     int result = 0;
     int natoms = 0;
-    unsigned long nframes = 0;
+    unsigned long i, nframes = 0;
     int64_t* offsets = NULL;
     const int natoms_ref = 3;
     const unsigned long nframes_ref = 101;
@@ -600,7 +600,7 @@ static void test_xtc_uncompressed_offsets() {
         die("Number of frames incorrect when reading xtc");
     }
 
-    for (unsigned long i = 0; i < nframes; i++) {
+    for (i = 0; i < nframes; i++) {
         if (offsets[i] != i * framesize_ref) {
             printf("Found offsets[%lu] %ld, expected %lu\n", i, offsets[i], i * framesize_ref);
             die("Offset incorrect when reading xtc");
@@ -621,7 +621,7 @@ static void test_xtc_compressed_offsets() {
     int magic = 0;
     int result = 0;
     int natoms = 0;
-    unsigned long nframes = 0;
+    unsigned long i, nframes = 0;
     int64_t* offsets = NULL;
     const int natoms_ref = 11;
     const unsigned long nframes_ref = 101;
@@ -649,7 +649,7 @@ static void test_xtc_compressed_offsets() {
         die("Opening xdrfile for reading");
     }
 
-    for (unsigned long i = 0; i < nframes; i++) {
+    for (i = 0; i < nframes; i++) {
         xdr_seek(xd, offsets[i], SEEK_SET);
         if (xdrfile_read_int(&magic, 1, xd) != 1) {
             die("xdrfile_read_int");

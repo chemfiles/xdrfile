@@ -26,7 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Needed for large-file seeking
+/* Needed for large-file seeking */
 #define _LARGEFILE_SOURCE
 #define _LARGEFILE64_SOURCE
 #define _FILE_OFFSET_BITS 64
@@ -115,8 +115,8 @@ static int xdr_string(XDR* xdrs, char** ip, unsigned int maxsize);
 static int xdr_opaque(XDR* xdrs, char* cp, unsigned int cnt);
 static void xdrstdio_create(XDR* xdrs, FILE* fp, enum xdr_op xop);
 
-// #define xdr_getpos(xdrs) (*(xdrs)->x_ops->x_getpostn)(xdrs)
-// #define xdr_setpos(xdrs, pos) (*(xdrs)->x_ops->x_setpostn)(xdrs, pos)
+/* #define xdr_getpos(xdrs) (*(xdrs)->x_ops->x_getpostn)(xdrs) */
+/* #define xdr_setpos(xdrs, pos) (*(xdrs)->x_ops->x_setpostn)(xdrs, pos) */
 #define xdr_destroy(xdrs)                                                      \
     do {                                                                       \
         if ((xdrs)->x_ops->x_destroy)                                          \

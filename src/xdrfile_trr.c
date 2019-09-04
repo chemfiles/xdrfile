@@ -520,14 +520,14 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
         return exdrFILENOTFOUND;
     }
 
-    // Go to file end
+    /* Go to file end */
     if (xdr_seek(xd, 0L, SEEK_END) != exdrOK) {
         xdrfile_close(xd);
         return exdrNR;
     }
-    // Cursor position is equivalent to file size
+    /* Cursor position is equivalent to file size */
     filesize = xdr_tell(xd);
-    // Go back to beginning
+    /* Go back to beginning */
     if (xdr_seek(xd, 0L, SEEK_SET) != exdrOK) {
         xdrfile_close(xd);
         return exdrNR;
@@ -538,19 +538,19 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
     }
     framebytes = calc_framebytes(&sh);
     est_nframes = (int)(filesize / ((int64_t)(framebytes + TRR_MIN_HEADER_SIZE)) +
-                        1); // must be at least 1 for successful growth
+                        1); /* must be at least 1 for successful growth */
 
-    // Allocate memory for the frame index array
+    /* Allocate memory for the frame index array */
     *offsets = malloc(sizeof(int64_t) * est_nframes);
     if (*offsets == NULL) {
-        // failed to allocate memory for `offsets`
+        /* failed to allocate memory for `offsets` */
         xdrfile_close(xd);
         return exdrNOMEM;
     }
     (*offsets)[0] = 0;
 
     while (1) {
-        // Skip `framebytes`
+        /* Skip `framebytes` */
         result = xdr_seek(xd, (int64_t)(framebytes), SEEK_CUR);
         if (result != exdrOK) {
             break;
@@ -559,20 +559,20 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
         (*nframes)++;
 
         if (*nframes == est_nframes) {
-            // grow the array exponentially
+            /* grow the array exponentially */
             est_nframes += est_nframes * 2;
             *offsets = realloc(*offsets, sizeof(int64_t) * est_nframes);
             if (*offsets == NULL) {
-                // failed to allocate memory for `offsets`
+                /* failed to allocate memory for `offsets` */
                 result = exdrNOMEM;
                 break;
             }
         }
 
-        // Store position in `offsets`
+        /* Store position in `offsets` */
         (*offsets)[*nframes] = xdr_tell(xd);
 
-        // Read header and calculate how much to skip next time
+        /* Read header and calculate how much to skip next time */
         result = do_trnheader(xd, 1, &sh);
         if (result != exdrOK) {
             break;
@@ -583,7 +583,7 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
     xdrfile_close(xd);
 
     if (result != exdrENDOFFILE) {
-        // report error to caller
+        /* report error to caller */
         return result;
     }
 

@@ -508,9 +508,8 @@ int calc_framebytes(t_trnheader* sh) {
 int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t** offsets) {
     XDRFILE* xd;
     t_trnheader sh;
-    int result, est_nframes, step, framebytes;
+    int result, est_nframes, framebytes;
     int64_t filesize;
-    float time, lambda;
     *nframes = 0;
 
     read_trr_natoms(fn, natoms);

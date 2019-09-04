@@ -282,8 +282,8 @@ static void test_trr()
 
 static void test_basic()
 {
-	float test_ii;      // 7 significant digits
-	double test_jj;     // 16 significant digits
+	float test_ii;      /* 7 significant digits */
+	double test_jj;     /* 16 significant digits */
 #define EPSILON_1 1e-7
 #define EPSILON_2 1e-4
 

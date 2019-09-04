@@ -132,23 +132,23 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
         return exdrFILENOTFOUND;
     }
 
-    // Go to file end
+    /* Go to file end */
     if (xdr_seek(xd, 0L, SEEK_END) != exdrOK) {
         xdrfile_close(xd);
         return exdrNR;
     }
-    // Cursor position is equivalent to file size
+    /* Cursor position is equivalent to file size */
     filesize = xdr_tell(xd);
 
-    // Dont bother with compression for nine atoms or less
+    /* Dont bother with compression for nine atoms or less */
     if (*natoms <= 9) {
         xdrfile_close(xd);
         framebytes = XTC_SMALL_HEADER_SIZE + XTC_SMALL_COORDS_SIZE * (*natoms);
         *nframes =
-            filesize / framebytes; // Should we complain if framesize doesn't divide filesize?
+            filesize / framebytes; /* Should we complain if framesize doesn't divide filesize? */
         *offsets = malloc(sizeof(int64_t) * (*nframes));
         if (*offsets == NULL) {
-            // failed to allocate memory for `offsets`
+            /* failed to allocate memory for `offsets` */
             return exdrNOMEM;
         }
         for (int i = 0; i < *nframes; i++) {
@@ -156,7 +156,7 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
         }
         return exdrOK;
     } else {
-        // Go back to the beginning of the file
+        /* Go back to the beginning of the file */
         if (xdr_seek(xd, (int64_t)XTC_HEADER_SIZE, SEEK_SET) != exdrOK) {
             xdrfile_close(xd);
             return exdrNR;
@@ -166,23 +166,23 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
             xdrfile_close(xd);
             return exdrENDOFFILE;
         }
-        framebytes = (framebytes + 3) & ~0x03; // Rounding to the next 32-bit boundary
+        framebytes = (framebytes + 3) & ~0x03; /* Rounding to the next 32-bit boundary */
         est_nframes = (int)(filesize / ((int64_t)(framebytes + XTC_HEADER_SIZE)) +
-                            1); // must be at least 1 for successful growth
-        // First `framebytes` might be larger than average, so we would underestimate `est_nframes`
+                            1); /* must be at least 1 for successful growth */
+        /* First `framebytes` might be larger than average, so we would underestimate `est_nframes` */
         est_nframes += est_nframes / 5;
 
-        // Allocate memory for the frame index array
+        /* Allocate memory for the frame index array */
         *offsets = malloc(sizeof(int64_t) * est_nframes);
         if (*offsets == NULL) {
-            // failed to allocate memory for `offsets`
+            /* failed to allocate memory for `offsets` */
             xdrfile_close(xd);
             return exdrNOMEM;
         }
         (*offsets)[0] = 0;
 
         while (1) {
-            // Skip `framebytes` and next header
+            /* Skip `framebytes` and next header */
             result = xdr_seek(xd, (int64_t)(framebytes + XTC_HEADER_SIZE), SEEK_CUR);
             if (result != exdrOK) {
                 break;
@@ -191,32 +191,32 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
             (*nframes)++;
 
             if (*nframes == est_nframes) {
-                // grow the array exponentially
+                /* grow the array exponentially */
                 est_nframes += est_nframes * 2;
                 *offsets = realloc(*offsets, sizeof(int64_t) * est_nframes);
                 if (*offsets == NULL) {
-                    // failed to allocate memory for `offsets`
+                    /* failed to allocate memory for `offsets` */
                     result = exdrNOMEM;
                     break;
                 }
             }
 
-            // Store position in `offsets`, adjust for header
+            /* Store position in `offsets`, adjust for header */
             (*offsets)[*nframes] = xdr_tell(xd) - (int64_t)(XTC_HEADER_SIZE);
 
-            // Read how much to skip next time
+            /* Read how much to skip next time */
             if (xdrfile_read_int(&framebytes, 1, xd) == 0) {
                 result = exdrENDOFFILE;
                 break;
             }
-            framebytes = (framebytes + 3) & ~0x03; // Rounding to the next 32-bit boundary
+            framebytes = (framebytes + 3) & ~0x03; /* Rounding to the next 32-bit boundary */
         }
 
         xdrfile_close(xd);
         free(x);
 
         if (result != exdrENDOFFILE) {
-            // report error to caller
+            /* report error to caller */
             return result;
         }
 

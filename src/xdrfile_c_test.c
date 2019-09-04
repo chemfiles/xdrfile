@@ -38,6 +38,11 @@
 #include "unistd.h"
 #endif
 
+/* define M_PI for C89 */
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327
+#endif
+
 /* get fixed-width types if we are using ANSI C99 */
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>

@@ -116,12 +116,9 @@ int read_xtc_natoms(const char* fn, int* natoms) {
 
 int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t** offsets) {
     XDRFILE* xd;
-    int i, result, est_nframes, step, framebytes;
+    int i, result, est_nframes, framebytes;
     int64_t filesize;
-    float time;
-    matrix box;
     rvec* x;
-    float prec;
     *nframes = 0;
 
     read_xtc_natoms(fn, natoms);

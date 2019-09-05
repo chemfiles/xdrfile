@@ -51,7 +51,7 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
 /* Read one frame of an open trr file. If either of x,v,f,box are
    NULL the arrays will be read from the file but not used.  */
 extern int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda,
-                    matrix box, rvec* x, rvec* v, rvec* f);
+                    matrix box, rvec* x, rvec* v, rvec* f, uint8_t* has_prop);
 
 /* Write a frame to trr file */
 extern int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
@@ -73,6 +73,12 @@ extern int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
  * It can have 8 bytes more if we have double time and lambda.
  */
 #define TRR_MIN_HEADER_SIZE 72
+
+/* Flags to signal the existance of box, positions, velocities and forces in a frame */
+#define TRR_HAS_BOX        1 /* 0b0001 Box */
+#define TRR_HAS_POSITIONS  2 /* 0b0010 Positions */
+#define TRR_HAS_VELOCITIES 4 /* 0b0100 Velocities */
+#define TRR_HAS_FORCES     8 /* 0b1000 Forces */
 
 #ifdef __cplusplus
 }

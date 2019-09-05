@@ -439,7 +439,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
 }
 
 static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda,
-                  matrix box, int* natoms, rvec* x, rvec* v, rvec* f) {
+                  matrix box, int* natoms, rvec* x, rvec* v, rvec* f, uint8_t* has_prop) {
     t_trnheader* sh;
     int result;
 
@@ -466,6 +466,20 @@ static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda,
         *step = sh->step;
         *t = (float)(sh->td);
         *lambda = (float)(sh->lambdad);
+        /* Flag what we read */
+        *has_prop = 0;
+        if (sh->box_size > 0) {
+            *has_prop |= TRR_HAS_BOX;
+        }
+        if (sh->x_size > 0) {
+            *has_prop |= TRR_HAS_POSITIONS;
+        }
+        if (sh->v_size > 0) {
+            *has_prop |= TRR_HAS_VELOCITIES;
+        }
+        if (sh->f_size > 0) {
+            *has_prop |= TRR_HAS_FORCES;
+        }
     }
     if ((result = do_htrn(xd, bRead, sh, box, x, v, f)) != exdrOK) {
         return result;
@@ -591,10 +605,10 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
 
 int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
               matrix box, rvec* x, rvec* v, rvec* f) {
-    return do_trn(xd, 0, &step, &t, &lambda, box, &natoms, x, v, f);
+    return do_trn(xd, 0, &step, &t, &lambda, box, &natoms, x, v, f, NULL);
 }
 
 int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda,
-             matrix box, rvec* x, rvec* v, rvec* f) {
-    return do_trn(xd, 1, step, t, lambda, box, &natoms, x, v, f);
+             matrix box, rvec* x, rvec* v, rvec* f, uint8_t* has_prop) {
+    return do_trn(xd, 1, step, t, lambda, box, &natoms, x, v, f, has_prop);
 }

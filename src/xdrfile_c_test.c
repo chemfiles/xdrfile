@@ -196,6 +196,7 @@ static void test_trr()
 	rvec *x2,*x1;
 	float lambda2,lambda1=0.4;
 	float toler=1e-3;
+    uint8_t flag_buf=0;
 
 	printf("Testing trr functionality:");
 	for(i=0; (i<DIM); i++) {
@@ -246,7 +247,7 @@ static void test_trr()
 
 	for(k=0; (k<nframes); k++)
 		{
-			result = read_trr(xd,natoms2,&step2,&time2,&lambda2,box2,x2,NULL,NULL);
+			result = read_trr(xd,natoms2,&step2,&time2,&lambda2,box2,x2,NULL,NULL,&flag_buf);
 			if (exdrOK != result) {
 				die_r("read_xtc",result);
 }

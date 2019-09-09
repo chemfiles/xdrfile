@@ -676,6 +676,75 @@ static void test_xtc_compressed_offsets() {
     printf(" PASSED\n");
 }
 
+static void test_trr_flag() {
+    const char* testfn = "../test_data/traj_n3_xvf.trr";
+    XDRFILE* xd;
+    int result = 0;
+    int natoms = 0;
+    unsigned long i, nframes = 0;
+    int64_t* offsets = NULL;
+    int step = 0;
+    float time = 0;
+    float lambda = 0;
+    matrix box;
+    const int natoms_ref = 3;
+    const unsigned long nframes_ref = 75;
+    uint8_t flag = 0;
+
+    printf("Testing trr flag functionality: ");
+
+    result = read_trr_header(testfn, &natoms, &nframes, &offsets);
+    if (exdrOK != result) {
+        die_r("read_trr_header", result);
+    }
+
+    if (natoms != natoms_ref) {
+        printf("Found number of atoms %d, expected %d\n", natoms, natoms_ref);
+        die("Number of atoms incorrect when reading trr");
+    }
+
+    if (nframes != nframes_ref) {
+        printf("Found number of frames %lu, expected %lu\n", nframes, nframes_ref);
+        die("Number of frames incorrect when reading trr");
+    }
+
+    xd = xdrfile_open(testfn, "r");
+    if (NULL == xd) {
+        die("Opening trr file for reading");
+    }
+
+    for (i = 0; i < nframes; i++) {
+        result = read_trr(xd, natoms, &step, &time, &lambda, box, NULL, NULL, NULL, &flag);
+        if (exdrOK != result) {
+            die_r("read_trr", result);
+        }
+
+        if (!(flag & TRR_HAS_BOX)) {
+            printf("Expected box in frame %d\n", i);
+            die("Box flag incorrect");
+        }
+        if (step % 2000 == 0 && !(flag & TRR_HAS_POSITIONS)) {
+            printf("Expected positions in frame %d\n", i);
+            die("Position flag incorrect");
+        }
+        if (step % 3000 == 0 && !(flag & TRR_HAS_VELOCITIES)) {
+            printf("Expected velocities in frame %d\n", i);
+            die("Velocity flag incorrect");
+        }
+        if (step % 5000 == 0 && !(flag & TRR_HAS_FORCES)) {
+            printf("Expected forces in frame %d\n", i);
+            die("Force flag incorrect");
+        }
+    }
+
+    free(offsets);
+
+#ifdef HAVE_UNISTD
+    unlink(testfn);
+#endif
+    printf(" PASSED\n");
+}
+
 int main(int argc, char *argv[])
 {
 	/* Test basic stuff */
@@ -693,6 +762,9 @@ int main(int argc, char *argv[])
 
     /* Test offsets of compressed xtc file by using seek*/
     test_xtc_compressed_offsets();
+
+    /* Test flag for data fields (box, x, v, f) in trr file */
+    test_trr_flag();
 
     return 0;
 }

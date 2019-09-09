@@ -320,7 +320,7 @@ static void test_basic()
 	len = strlen(buf) + 1;
 	if (len >= BUFLEN) {
 		die("Increase BUFLEN");
-}
+        }
 	strcpy(ptr, buf);
 	strcpy((char *) uptr, buf);
 	/* Initiate float arrays */
@@ -679,6 +679,7 @@ int main(int argc, char *argv[])
 {
 	/* Test basic stuff */
 	test_basic();
+
 	/* Now test writing a complete xtc file */
 	test_xtc();
 

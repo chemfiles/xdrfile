@@ -118,11 +118,9 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
     XDRFILE* xd;
     int i, result, est_nframes, framebytes;
     int64_t filesize;
-    rvec* x;
     *nframes = 0;
 
     read_xtc_natoms(fn, natoms);
-    x = malloc(*natoms * sizeof(*x));
 
     xd = xdrfile_open(fn, "r");
     if (NULL == xd) {
@@ -210,7 +208,6 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
         }
 
         xdrfile_close(xd);
-        free(x);
 
         if (result != exdrENDOFFILE) {
             /* report error to caller */

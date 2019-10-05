@@ -15,17 +15,22 @@ if (NOT "${INT_SIZE}" MATCHES "^(2|4|8|16)$") # in Bytes; 16, 32, 64, 128 bit
     message(FATAL_ERROR "Int size ${INT_SIZE} is not supported")
 endif()
 
+set(HEADERS
+    include/xdrfile.h
+    include/xdrfile_trr.h
+    include/xdrfile_xtc.h)
+
 set(SOURCES
     src/xdrfile.c
     src/xdrfile_trr.c
     src/xdrfile_xtc.c
-    include/xdrfile.h
-    include/xdrfile_trr.h
-    include/xdrfile_xtc.h
+    "${HEADERS}"
 )
 
-add_library(xdrfile OBJECT ${SOURCES})
+add_library(xdrfile STATIC ${SOURCES})
 target_include_directories(xdrfile PUBLIC include)
+
+set_target_properties(xdrfile PROPERTIES PUBLIC_HEADER "${HEADERS}")
 
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
     enable_testing()
@@ -41,3 +46,7 @@ if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
         file(COPY test_data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     endif()
 endif()
+
+install (TARGETS xdrfile
+	LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
+	PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_PREFIX}/include")

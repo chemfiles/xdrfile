@@ -110,7 +110,6 @@ extern char* exdr_message[exdrNR];
 #define DIM 3
 typedef float matrix[DIM][DIM];
 typedef float rvec[DIM];
-typedef int mybool;
 
 /*! \brief Open a portable binary file, just like fopen()
  *

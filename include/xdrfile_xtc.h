@@ -1,6 +1,4 @@
-/* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
- *
- * Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
+/* Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +38,7 @@ extern "C" {
  */
 
 /* This function returns the number of atoms in the xtc file in *natoms */
-extern int read_xtc_natoms(const char* fn, int* natoms);
+int read_xtc_natoms(const char* fn, int* natoms);
 
 /* This function returns the number of frames and the number of atoms
  * in the xtc file in *natoms and *nframes.
@@ -50,12 +48,10 @@ extern int read_xtc_natoms(const char* fn, int* natoms);
 int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t** offsets);
 
 /* Read one frame of an open xtc file */
-extern int read_xtc(XDRFILE* xd, int natoms, int* step, float* time, matrix box,
-                    rvec* x, float* prec);
+int read_xtc(XDRFILE* xd, int natoms, int* step, float* time, matrix box, rvec* x, float* prec);
 
 /* Write a frame to xtc file */
-extern int write_xtc(XDRFILE* xd, int natoms, int step, float time, matrix box,
-                     rvec* x, float prec);
+int write_xtc(XDRFILE* xd, int natoms, int step, float time, matrix box, rvec* x, float prec);
 
 /* XTC small header size (natoms<=9).
  *  > int(4) magic

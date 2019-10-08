@@ -171,6 +171,9 @@ static void test_xtc() {
         k++;
     } while (result == exdrOK);
 
+    free(x1);
+    free(x2);
+
     xdrfile_close(xd);
 #ifdef HAVE_UNISTD
     unlink(testfn);
@@ -269,6 +272,9 @@ static void test_trr() {
         }
     }
 
+    free(x1);
+    free(x2);
+
     xdrfile_close(xd);
 #ifdef HAVE_UNISTD
     unlink(testfn);
@@ -311,10 +317,12 @@ static void test_basic() {
         }
         strcpy(ptr, buf);
         strcpy((char*)uptr, buf);
-        /* Initiate float arrays */
+        /* Initiate arrays */
         for (i = 0; (i < BUFLEN); i++) {
             fptr[i] = cos(i * 13.0 / M_PI);
             dptr[i] = sin(i * 13.0 / M_PI);
+            iptr[i] = (int)(floor(dptr[i] * 1000));
+            uiptr[i] = (unsigned int)(floor(dptr[i] * 1000) + 1001);
         }
         /* Initiate opaque array */
         memcpy(optr, dptr, BUFLEN);

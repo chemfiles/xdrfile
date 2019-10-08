@@ -1,6 +1,4 @@
-/* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
- *
- * Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
+/* Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +37,7 @@ extern "C" {
  */
 
 /* This function returns the number of atoms in the trr file in *natoms */
-extern int read_trr_natoms(const char* fn, int* natoms);
+int read_trr_natoms(const char* fn, int* natoms);
 
 /* This function returns the number of frames and the number of atoms
  * in the trr file in *natoms and *nframes.
@@ -50,12 +48,12 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
 
 /* Read one frame of an open trr file. If either of x,v,f,box are
    NULL the arrays will be read from the file but not used.  */
-extern int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda,
-                    matrix box, rvec* x, rvec* v, rvec* f, uint8_t* has_prop);
+int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda, matrix box, rvec* x,
+             rvec* v, rvec* f, uint8_t* has_prop);
 
 /* Write a frame to trr file */
-extern int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
-                     matrix box, rvec* x, rvec* v, rvec* f);
+int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda, matrix box, rvec* x,
+              rvec* v, rvec* f);
 
 /* Minimum TRR header size.
  *  > int(4) magic
@@ -75,10 +73,10 @@ extern int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
 #define TRR_MIN_HEADER_SIZE 72
 
 /* Flags to signal the existance of box, positions, velocities and forces in a frame */
-#define TRR_HAS_BOX        1 /* 0b0001 Box */
-#define TRR_HAS_POSITIONS  2 /* 0b0010 Positions */
+#define TRR_HAS_BOX 1        /* 0b0001 Box */
+#define TRR_HAS_POSITIONS 2  /* 0b0010 Positions */
 #define TRR_HAS_VELOCITIES 4 /* 0b0100 Velocities */
-#define TRR_HAS_FORCES     8 /* 0b1000 Forces */
+#define TRR_HAS_FORCES 8     /* 0b1000 Forces */
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,4 @@
-/* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
- *
- * Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
+/* Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,22 +24,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xdrfile_xtc.h"
-#include "xdrfile.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "xdrfile.h"
+#include "xdrfile_xtc.h"
 
 #define XTC_MAGIC 1995
 
 enum { FALSE, TRUE };
 
-static int xtc_header(
-	XDRFILE* xd,
-	int* natoms,
-	int* step,
-	float* time,
-	mybool bRead
-) {
+static int xtc_header(XDRFILE* xd, int* natoms, int* step, float* time, mybool bRead) {
     int result, magic, n = 1;
 
     /* Note: read is same as write. He he he */
@@ -69,14 +62,7 @@ static int xtc_header(
     return exdrOK;
 }
 
-static int xtc_coord(
-	XDRFILE* xd,
-	int* natoms,
-	matrix box,
-	rvec* x,
-	float* prec,
-    mybool bRead
-) {
+static int xtc_coord(XDRFILE* xd, int* natoms, matrix box, rvec* x, float* prec, mybool bRead) {
     int result;
 
     /* box */
@@ -164,7 +150,8 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
         framebytes = (framebytes + 3) & ~0x03; /* Rounding to the next 32-bit boundary */
         est_nframes = (int)(filesize / ((int64_t)(framebytes + XTC_HEADER_SIZE)) +
                             1); /* must be at least 1 for successful growth */
-        /* First `framebytes` might be larger than average, so we would underestimate `est_nframes` */
+        /* First `framebytes` might be larger than average, so we would underestimate `est_nframes`
+         */
         est_nframes += est_nframes / 5;
 
         /* Allocate memory for the frame index array */
@@ -219,15 +206,7 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
 }
 
 /* Read subsequent frames */
-int read_xtc(
-	XDRFILE* xd,
-	int natoms,
-	int* step,
-	float* time,
-	matrix box,
-    rvec* x,
-	float* prec
-) {
+int read_xtc(XDRFILE* xd, int natoms, int* step, float* time, matrix box, rvec* x, float* prec) {
     int result;
 
     if ((result = xtc_header(xd, &natoms, step, time, TRUE)) != exdrOK) {
@@ -242,15 +221,7 @@ int read_xtc(
 }
 
 /* Write a frame to xtc file */
-int write_xtc(
-	XDRFILE* xd,
-	int natoms,
-	int step,
-	float time,
-	matrix box,
-    rvec* x,
-	float prec
-) {
+int write_xtc(XDRFILE* xd, int natoms, int step, float time, matrix box, rvec* x, float prec) {
     int result;
 
     if ((result = xtc_header(xd, &natoms, &step, &time, FALSE)) != exdrOK) {

@@ -1,6 +1,4 @@
-/* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
- *
- * Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
+/* Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,24 +42,24 @@
 in a trjfile, sizes are given in bytes.*/
 typedef struct {
     mybool bDouble; /* Double precision?                    */
-    int ir_size;    /* Backward compatibility		        */
-    int e_size;     /* Backward compatibility		        */
-    int box_size;   /* Non zero if a box is present			*/
-    int vir_size;   /* Backward compatibility		        */
-    int pres_size;  /* Backward compatibility		        */
-    int top_size;   /* Backward compatibility		        */
-    int sym_size;   /* Backward compatibility		        */
-    int x_size;     /* Non zero if coordinates are present	*/
-    int v_size;     /* Non zero if velocities are present	*/
-    int f_size;     /* Non zero if forces are present		*/
+    int ir_size;    /* Backward compatibility               */
+    int e_size;     /* Backward compatibility               */
+    int box_size;   /* Non zero if a box is present         */
+    int vir_size;   /* Backward compatibility               */
+    int pres_size;  /* Backward compatibility               */
+    int top_size;   /* Backward compatibility               */
+    int sym_size;   /* Backward compatibility               */
+    int x_size;     /* Non zero if coordinates are present  */
+    int v_size;     /* Non zero if velocities are present   */
+    int f_size;     /* Non zero if forces are present       */
 
-    int natoms;     /* The total number of atoms			*/
-    int step;       /* Current step number				    */
-    int nre;        /* Backward compatibility		        */
-    float tf;       /* Current time					        */
-    float lambdaf;  /* Current value of lambda			    */
-    double td;      /* Current time					        */
-    double lambdad; /* Current value of lambda			    */
+    int natoms;     /* The total number of atoms            */
+    int step;       /* Current step number                  */
+    int nre;        /* Backward compatibility               */
+    float tf;       /* Current time                         */
+    float lambdaf;  /* Current value of lambda              */
+    double td;      /* Current time                         */
+    double lambdad; /* Current value of lambda              */
 } t_trnheader;
 
 static int nFloatSize(t_trnheader* sh, int* nflsz) {
@@ -192,8 +190,8 @@ static int do_trnheader(XDRFILE* xd, mybool bRead, t_trnheader* sh) {
     return exdrOK;
 }
 
-static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
-                   rvec* x, rvec* v, rvec* f) {
+static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box, rvec* x, rvec* v,
+                   rvec* f) {
     double pvd[DIM * DIM];
     double* dx = NULL;
     float pvf[DIM * DIM];
@@ -252,8 +250,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 if (bRead) {
                     if (NULL != x) {
                         for (i = 0; (i < sh->natoms); i++) {
@@ -277,8 +274,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 if (NULL != v) {
                     for (i = 0; (i < sh->natoms); i++) {
                         for (j = 0; (j < DIM); j++) {
@@ -300,8 +296,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_double(dx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 if (NULL != f) {
                     for (i = 0; (i < sh->natoms); i++) {
                         for (j = 0; (j < DIM); j++) {
@@ -370,8 +365,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 if (bRead) {
                     if (NULL != x) {
                         for (i = 0; (i < sh->natoms); i++) {
@@ -395,8 +389,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 if (NULL != v) {
                     for (i = 0; (i < sh->natoms); i++) {
                         for (j = 0; (j < DIM); j++) {
@@ -418,8 +411,7 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
                     }
                 }
             }
-            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) ==
-                sh->natoms * DIM) {
+            if (xdrfile_read_float(fx, sh->natoms * DIM, xd) == sh->natoms * DIM) {
                 if (NULL != f) {
                     for (i = 0; (i < sh->natoms); i++) {
                         for (j = 0; (j < DIM); j++) {
@@ -438,8 +430,8 @@ static int do_htrn(XDRFILE* xd, mybool bRead, t_trnheader* sh, matrix box,
     return exdrOK;
 }
 
-static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda,
-                  matrix box, int* natoms, rvec* x, rvec* v, rvec* f, uint8_t* has_prop) {
+static int do_trn(XDRFILE* xd, mybool bRead, int* step, float* t, float* lambda, matrix box,
+                  int* natoms, rvec* x, rvec* v, rvec* f, uint8_t* has_prop) {
     t_trnheader* sh;
     int result;
 
@@ -603,12 +595,12 @@ int read_trr_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
     return exdrOK;
 }
 
-int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda,
-              matrix box, rvec* x, rvec* v, rvec* f) {
+int write_trr(XDRFILE* xd, int natoms, int step, float t, float lambda, matrix box, rvec* x,
+              rvec* v, rvec* f) {
     return do_trn(xd, 0, &step, &t, &lambda, box, &natoms, x, v, f, NULL);
 }
 
-int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda,
-             matrix box, rvec* x, rvec* v, rvec* f, uint8_t* has_prop) {
+int read_trr(XDRFILE* xd, int natoms, int* step, float* t, float* lambda, matrix box, rvec* x,
+             rvec* v, rvec* f, uint8_t* has_prop) {
     return do_trn(xd, 1, step, t, lambda, box, &natoms, x, v, f, has_prop);
 }

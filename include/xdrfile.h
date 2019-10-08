@@ -1,6 +1,4 @@
-/* -*- mode: c; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4 -*-
- *
- * Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
+/* Copyright (c) 2009-2014, Erik Lindahl & David van der Spoel
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -393,16 +391,14 @@ int xdrfile_write_opaque(char* ptr, int nbytes, XDRFILE* xfp);
  *  \return           Number of coordinate triplets written.
  *                    IMPORTANT: Check that this is equal to ncoord - if it is
  *                    negative, an error occured. This should not happen with
- *	   	              normal data, but if your coordinates are NaN or
+ *                    normal data, but if your coordinates are NaN or
  *very large (>1e6) it is not possible to use the compression.
  *
  *  \warning          The compression algorithm is not part of the XDR standard,
  *                    and very complicated, so you will need this xdrfile module
  *                    to read it later.
  */
-int xdrfile_compress_coord_float(
-	float* ptr, int ncoord, float precision, XDRFILE* xfp
-);
+int xdrfile_compress_coord_float(float* ptr, int ncoord, float precision, XDRFILE* xfp);
 
 /*! \brief Decompress coordiates from XDR file to array of floats
  *
@@ -433,9 +429,7 @@ int xdrfile_compress_coord_float(
  *                    just before the compressed coordinate data, so you can
  *                    read it first and allocated enough memory.
  */
-int xdrfile_decompress_coord_float(
-	float* ptr, int* ncoord, float* precision, XDRFILE* xfp
-);
+int xdrfile_decompress_coord_float(float* ptr, int* ncoord, float* precision, XDRFILE* xfp);
 
 /*! \brief Compress coordiates in a double array to XDR file
  *
@@ -467,9 +461,7 @@ int xdrfile_decompress_coord_float(
  *                    and very complicated, so you will need this xdrfile module
  *                    to read it later.
  */
-int xdrfile_compress_coord_double(
-	double* ptr, int ncoord, double precision, XDRFILE* xfp
-);
+int xdrfile_compress_coord_double(double* ptr, int ncoord, double precision, XDRFILE* xfp);
 
 /*! \brief Decompress coordiates from XDR file to array of doubles
  *
@@ -502,9 +494,7 @@ int xdrfile_compress_coord_double(
  *                    just before the compressed coordinate data, so you can
  *                    read it first and allocated enough memory.
  */
-int xdrfile_decompress_coord_double(
-	double* ptr, int* ncoord, double* precision, XDRFILE* xfp
-);
+int xdrfile_decompress_coord_double(double* ptr, int* ncoord, double* precision, XDRFILE* xfp);
 
 int64_t xdr_tell(XDRFILE* xd);
 int xdr_seek(XDRFILE* xd, int64_t pos, int whence);

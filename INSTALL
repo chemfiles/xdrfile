@@ -1,0 +1,22 @@
+INSTALL
+-------
+1) Create a build directory
+
+     mkdir build
+
+2) Change to build directory
+
+     cd build
+
+3) Run cmake, to specify C and Fortran compilers use CC and FC environment
+variables, to specify installation prefix use -DCMAKE_INSTALL_PREFIX:
+
+     CC=gcc FC=gfortran cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/opt/xdrfile ..
+
+4) Compile
+
+     make
+
+5) Install into specified prefix directory
+
+     make install OR sudo make install

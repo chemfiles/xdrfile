@@ -114,9 +114,9 @@ int read_xtc_natoms(const char* fn, int* natoms) {
     return result;
 }
 
-int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t** offsets) {
+int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t** offsets, int *frameBytes) {
     XDRFILE* xd;
-    int i, result, est_nframes, framebytes;
+    int i, result, est_nframes;
     int64_t filesize;
     rvec* x;
     *nframes = 0;
@@ -140,16 +140,16 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
     /* Dont bother with compression for nine atoms or less */
     if (*natoms <= 9) {
         xdrfile_close(xd);
-        framebytes = XTC_SMALL_HEADER_SIZE + XTC_SMALL_COORDS_SIZE * (*natoms);
+        *frameBytes = XTC_SMALL_HEADER_SIZE + XTC_SMALL_COORDS_SIZE * (*natoms);
         *nframes =
-            filesize / framebytes; /* Should we complain if framesize doesn't divide filesize? */
+            filesize / *frameBytes; /* Should we complain if framesize doesn't divide filesize? */
         *offsets = malloc(sizeof(int64_t) * (*nframes));
         if (*offsets == NULL) {
             /* failed to allocate memory for `offsets` */
             return exdrNOMEM;
         }
         for (i = 0; i < *nframes; i++) {
-            (*offsets)[i] = i * framebytes;
+            (*offsets)[i] = i * *frameBytes;
         }
         return exdrOK;
     } else {
@@ -159,12 +159,12 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
             return exdrNR;
         }
 
-        if (xdrfile_read_int(&framebytes, 1, xd) == 0) {
+        if (xdrfile_read_int(frameBytes, 1, xd) == 0) {
             xdrfile_close(xd);
             return exdrENDOFFILE;
         }
-        framebytes = (framebytes + 3) & ~0x03; /* Rounding to the next 32-bit boundary */
-        est_nframes = (int)(filesize / ((int64_t)(framebytes + XTC_HEADER_SIZE)) +
+        *frameBytes = (*frameBytes + 3) & ~0x03; /* Rounding to the next 32-bit boundary */
+        est_nframes = (int)(filesize / ((int64_t)(*frameBytes + XTC_HEADER_SIZE)) +
                             1); /* must be at least 1 for successful growth */
         /* First `framebytes` might be larger than average, so we would underestimate `est_nframes` */
         est_nframes += est_nframes / 5;
@@ -180,7 +180,7 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
 
         while (1) {
             /* Skip `framebytes` and next header */
-            result = xdr_seek(xd, (int64_t)(framebytes + XTC_HEADER_SIZE), SEEK_CUR);
+            result = xdr_seek(xd, (int64_t)(*frameBytes + XTC_HEADER_SIZE), SEEK_CUR);
             if (result != exdrOK) {
                 break;
             }
@@ -202,11 +202,11 @@ int read_xtc_header(const char* fn, int* natoms, unsigned long* nframes, int64_t
             (*offsets)[*nframes] = xdr_tell(xd) - (int64_t)(XTC_HEADER_SIZE);
 
             /* Read how much to skip next time */
-            if (xdrfile_read_int(&framebytes, 1, xd) == 0) {
+            if (xdrfile_read_int(frameBytes, 1, xd) == 0) {
                 result = exdrENDOFFILE;
                 break;
             }
-            framebytes = (framebytes + 3) & ~0x03; /* Rounding to the next 32-bit boundary */
+            *frameBytes = (*frameBytes + 3) & ~0x03; /* Rounding to the next 32-bit boundary */
         }
 
         xdrfile_close(xd);

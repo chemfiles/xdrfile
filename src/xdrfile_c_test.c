@@ -588,10 +588,11 @@ static void test_xtc_uncompressed_offsets() {
     const int natoms_ref = 3;
     const unsigned long nframes_ref = 101;
     const int64_t framesize_ref = 92;
+    int frameBytes = 0;
 
     printf("Testing uncompressed xtc offset functionality: ");
 
-    result = read_xtc_header(testfn, &natoms, &nframes, &offsets);
+    result = read_xtc_header(testfn, &natoms, &nframes, &offsets, &frameBytes);
     if (exdrOK != result) {
         die_r("read_xtc_header", result);
     }
@@ -632,10 +633,11 @@ static void test_xtc_compressed_offsets() {
     const int natoms_ref = 11;
     const unsigned long nframes_ref = 101;
     const int magic_ref = 1995;
+    int frameBytes = 0;
 
     printf("Testing compressed xtc offset functionality: ");
 
-    result = read_xtc_header(testfn, &natoms, &nframes, &offsets);
+    result = read_xtc_header(testfn, &natoms, &nframes, &offsets, &frameBytes);
     if (exdrOK != result) {
         die_r("read_xtc_header", result);
     }
